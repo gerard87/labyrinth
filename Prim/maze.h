@@ -1,0 +1,11 @@
+int** generateMaze();    
+void generateStartingPoints(int** maze);
+void display();
+int contains(Point* list,int length, Point aPoint);
+int containsAlt(Point* list, int length, int row, int col);
+void randPrim(int** maze, int rows, int cols);
+void printMaze(int** maze, int rows, int cols);
+void removeIndex(Point* list, int length, int index);
+void removePoint(Point* list, int length, Point aPoint);
+int addNearbyWalls(int** maze, int rows, int cols, Point* list, int length, Point aPoint);
+void encloseMaze(int** maze, int rows, int cols);

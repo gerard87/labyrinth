@@ -1,44 +1,59 @@
 // Portarlo a C++, así podemos utilizar listas etc.
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
 #define MAZE_ROWS 25
-#define MAZE_COLS 50
+#define MAZE_COLS 25
+
+int** allocMaze(int rows, int cols);
 
 typedef struct {
     int row;
     int col;
 } Point;
 
-int contains(Point* list,int length, Point aPoint);
-int containsAlt(Point* list, int length, int row, int col);
-int** allocMaze(int rows, int cols);
-void randPrim(int** maze, int rows, int cols);
-void printMaze(int** maze, int rows, int cols);
-void removeIndex(Point* list, int length, int index);
-void removePoint(Point* list, int length, Point aPoint);
-int addNearbyWalls(int** maze, int rows, int cols, Point* list, int length, Point aPoint);
-void encloseMaze(int** maze, int rows, int cols);
+//int **the_maze = NULL;
 
-int main(){
+int** generateMaze(){
+    srand(time(NULL));    
+    int** the_maze = allocMaze(MAZE_ROWS,MAZE_COLS); 
+    
+    randPrim(the_maze,MAZE_ROWS,MAZE_COLS);
+    encloseMaze(the_maze, MAZE_ROWS,MAZE_COLS);
+    generateStartingPoints(the_maze);    
 
-   srand(time(NULL));
-   int** maze = allocMaze(MAZE_ROWS,MAZE_COLS); 
-   
-   randPrim(maze,MAZE_ROWS,MAZE_COLS);
-   encloseMaze(maze, MAZE_ROWS,MAZE_COLS);
- 
-   printMaze(maze, MAZE_ROWS, MAZE_COLS);
+    return the_maze;
 }
 
+void generateStartingPoints(int** maze) {
+    for (int col = 1; col < MAZE_COLS - 1; col++) {
+        if (maze[1][col] == 0) {
+            maze[1][col] = 2;
+            break;
+        }
+    }
+
+    for (int col = MAZE_COLS - 1; col> 1; col--) {
+        if (maze[MAZE_ROWS-2][col] == 0) {
+            maze[MAZE_ROWS-2][col] = 3;
+            break;
+        }
+    }
+}
 
 //Print the maze, x's for walls
 void printMaze(int** maze, int rows, int cols){
    for(int i = 0; i < rows; i++){  
         for(int k = 0; k < cols; k++){  
             switch(maze[i][k]){
+                case 3:
+                printf("C");
+                break;  
+                case 2:
+                printf("P");
+                break;                
                 case 1:
                     printf("0");
                     break;
