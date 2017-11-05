@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <GL/glut.h>
 
+#include "maze.h"
+
+
 #define WIDTH 1200
 #define HEIGHT 600
 

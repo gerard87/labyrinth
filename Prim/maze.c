@@ -8,6 +8,13 @@
 
 
 int** allocMaze(int rows, int cols);
+int** generateMaze(int rows, int cols);    
+void createHoles(int** maze);
+int random_int(int min, int max);
+void generateStartingPoints(int** maze);   
+void encloseMaze(int** maze, int rows, int cols);  
+void randPrim(int** maze, int rows, int cols);    
+
 
 int MAZE_ROWS = 0;
 int MAZE_COLS = 0;
