@@ -4,27 +4,61 @@
 #include <math.h>
 #include <time.h>
 
-#define MAZE_ROWS 25
-#define MAZE_COLS 25
+#define MAX_HOLES 35
+
 
 int** allocMaze(int rows, int cols);
+
+int MAZE_ROWS = 0;
+int MAZE_COLS = 0;
 
 typedef struct {
     int row;
     int col;
 } Point;
 
-//int **the_maze = NULL;
-
-int** generateMaze(){
+int** generateMaze(int rows, int cols){
+    MAZE_ROWS = rows;
+    MAZE_COLS = cols;    
     srand(time(NULL));    
     int** the_maze = allocMaze(MAZE_ROWS,MAZE_COLS); 
     
     randPrim(the_maze,MAZE_ROWS,MAZE_COLS);
     encloseMaze(the_maze, MAZE_ROWS,MAZE_COLS);
-    generateStartingPoints(the_maze);    
+    generateStartingPoints(the_maze); 
+    createHoles(the_maze);   
 
     return the_maze;
+}
+
+void createHoles(int** maze) {
+    int holes = 0;
+    
+    Point points[MAX_HOLES];
+    int generated_points = 0;
+    while (generated_points < MAX_HOLES) {
+        Point p;
+        int is_wall = 0;
+
+        do {
+            p.row = random_int(1, MAZE_ROWS - 2);
+            p.col = random_int(1, MAZE_COLS - 2);
+            if (maze[p.row][p.col] == 1) is_wall = 1;
+        } while (!is_wall);
+        points[generated_points++] = p;
+    }
+
+    for (int i = 0; i < MAX_HOLES; i++) {
+        Point p = points[i];
+        printf("Point to be broken: %d, %d\n", p.row, p.col);
+        maze[p.row][p.col] = 0;
+    }
+
+
+}
+
+int random_int(int min, int max){
+   return min + rand() % (max+1 - min);
 }
 
 void generateStartingPoints(int** maze) {
@@ -43,7 +77,6 @@ void generateStartingPoints(int** maze) {
     }
 }
 
-//Print the maze, x's for walls
 void printMaze(int** maze, int rows, int cols){
    for(int i = 0; i < rows; i++){  
         for(int k = 0; k < cols; k++){  
@@ -89,7 +122,6 @@ int** allocMaze(int rows, int cols){
      return array;
 }
 
-//return 1 if the posn list contains the posn, else 0
 int contains(Point* list,int length, Point aPoint){
     for(int k = 0; k < length; k++){
         if(list[k].row == aPoint.row && list[k].col == aPoint.col)
@@ -105,7 +137,6 @@ int containsAlt(Point* list, int length, int row, int col){
     return contains(list, length, theCell);
 }
 
-//Remove the posn at the specified index and shift late elements left
 void removeIndex(Point* list, int length, int index){
     for(int k = index+1; k < length; k++){
         list[k-1] = list[k];
@@ -113,7 +144,6 @@ void removeIndex(Point* list, int length, int index){
 }
 
 void removePoint(Point* list, int length, Point aPoint){
-    //Find the index of the posn then use other function
     for(int k = 0; k < length; k++){
         if(list[k].row == aPoint.row && list[k].col == aPoint.col)
             return removeIndex(list, length, k);
@@ -121,7 +151,6 @@ void removePoint(Point* list, int length, Point aPoint){
     printf("\n\n -- No such Point %d %d Unvisited  \n\n", aPoint.row, aPoint.col);
 }
 
-//Make all the borders walls
 void encloseMaze(int** maze, int rows, int cols){
     for(int i = 0; i < cols; i++){
         maze[0][i] = 1;
@@ -251,11 +280,9 @@ void randPrim(int** maze, int rows, int cols){
                 unvisitedIndex -= 1;
                 wallListLength += addNearbyWalls(maze, rows, cols, wallList, wallListLength, nextMove);
             }
-            //printMaze(maze,rows,cols);
         }
 
-        if(unvisitedIndex == 0)
-            break;
+        if(unvisitedIndex == 0) break;
 
         int nextIndex = rand() % unvisitedIndex;
         Point nextCell = unvisited[nextIndex];
@@ -263,7 +290,6 @@ void randPrim(int** maze, int rows, int cols){
         removeIndex(unvisited, unvisitedIndex, nextIndex);
         unvisitedIndex -= 1;
         
-        //add those walls to nthe list
         wallListLength += addNearbyWalls(maze,rows,cols,wallList,wallListLength,nextCell);
     }
 

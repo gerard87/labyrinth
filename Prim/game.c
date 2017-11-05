@@ -2,9 +2,9 @@
 #include <GL/glut.h>
 
 #define WIDTH 1200
-#define HEIGHT 1200
+#define HEIGHT 600
 
-#define MAZE_ROWS 51
+#define MAZE_ROWS 25
 #define MAZE_COLS 51
 
 void display();
@@ -13,7 +13,7 @@ int** maze = NULL;
 
 int main(int argc, char * argv[]){
    
-    maze = generateMaze();
+    maze = generateMaze(MAZE_ROWS, MAZE_COLS);
     
     printMaze(maze, MAZE_ROWS, MAZE_COLS);
 
@@ -58,18 +58,12 @@ void display() {
 
         glBegin(GL_QUADS);
 
-    //   glVertex2i(HEIGHT - row * HEIGHT/MAZE_ROWS,col *  WIDTH/MAZE_COLS); 
-    //   glVertex2i(HEIGHT - (row+1)*HEIGHT/MAZE_ROWS,col*WIDTH/MAZE_COLS); 
-    //   glVertex2i(HEIGHT - (row+1)*HEIGHT/MAZE_ROWS,(col+1)*WIDTH/MAZE_COLS); 
-    //   glVertex2i(HEIGHT - row*HEIGHT/MAZE_ROWS,(col+1)*WIDTH/MAZE_COLS);
-
-    glVertex2i(col *  WIDTH/MAZE_COLS, HEIGHT - row * HEIGHT/MAZE_ROWS); 
-    glVertex2i(col*WIDTH/MAZE_COLS, HEIGHT - (row+1)*HEIGHT/MAZE_ROWS); 
-    glVertex2i((col+1)*WIDTH/MAZE_COLS, HEIGHT - (row+1)*HEIGHT/MAZE_ROWS); 
-    glVertex2i((col+1)*WIDTH/MAZE_COLS, HEIGHT - row*HEIGHT/MAZE_ROWS);
+        glVertex2i(col *  WIDTH/MAZE_COLS, HEIGHT - row * HEIGHT/MAZE_ROWS); 
+        glVertex2i(col*WIDTH/MAZE_COLS, HEIGHT - (row+1)*HEIGHT/MAZE_ROWS); 
+        glVertex2i((col+1)*WIDTH/MAZE_COLS, HEIGHT - (row+1)*HEIGHT/MAZE_ROWS); 
+        glVertex2i((col+1)*WIDTH/MAZE_COLS, HEIGHT - row*HEIGHT/MAZE_ROWS);
         
         glEnd();
-        //}
     }
 
     glutSwapBuffers();
