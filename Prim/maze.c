@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 
-#define MAX_HOLES 35
+#define MAX_HOLES 60
 
 
 int** allocMaze(int rows, int cols);
@@ -50,7 +50,15 @@ void createHoles(int** maze) {
         do {
             p.row = random_int(1, MAZE_ROWS - 2);
             p.col = random_int(1, MAZE_COLS - 2);
-            if (maze[p.row][p.col] == 1) is_wall = 1;
+            if (maze[p.row][p.col] == 1) {
+                if (p.row - 1 > 0 && maze[p.row - 1][p.col] == 1) continue;
+                if (p.row + 1 < MAZE_ROWS - 1 && maze[p.row + 1][p.col] == 1) continue;
+                if (p.col - 1 > 0 && maze[p.row][p.col] - 1 == 1) continue;
+                if (p.col + 1 < MAZE_COLS - 1 && maze[p.row][p.col + 1] == 1) continue;
+                
+                
+                is_wall = 1;
+            }
         } while (!is_wall);
         points[generated_points++] = p;
     }
