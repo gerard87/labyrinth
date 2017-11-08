@@ -7,18 +7,43 @@
 #define WIDTH 1200
 #define HEIGHT 600
 
-#define MAZE_ROWS 25
-#define MAZE_COLS 51
-
 void display();
 
 int** maze = NULL;
+int maze_rows;
+int maze_cols;
 
 int main(int argc, char * argv[]){
-   
-    maze = generateMaze(MAZE_ROWS, MAZE_COLS);
+
+
+    if ( argc < 3 )
+	{
+		fprintf( stderr, "%s: please specify maze dimensions!\n", argv[0] );
+		exit( 1 );
+	}
+	//Read maze dimensions from command line arguments
+	if ( sscanf( argv[1], "%d", &maze_rows ) + sscanf( argv[2], "%d", &maze_cols ) < 2 )
+	{
+		fprintf( stderr, "%s: invalid maze size value!\n", argv[0] );
+		exit( 1 );
+	}
+	//Allow only odd dimensions
+	if ( !( maze_rows % 2 ) || !( maze_cols % 2 ) )
+	{
+		fprintf( stderr, "%s: dimensions must be odd!\n", argv[0] );
+		exit( 1 );
+	}
+	//Do not allow negative dimensions
+	if ( maze_rows <= 0 || maze_cols <= 0 )
+	{
+		fprintf( stderr, "%s: dimensions must be greater than 0!\n", argv[0] );
+		exit( 1 );
+    }
+
+
+    maze = generateMaze(maze_rows, maze_cols);
     
-    printMaze(maze, MAZE_ROWS, MAZE_COLS);
+    printMaze(maze, maze_rows, maze_cols);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -41,8 +66,8 @@ void display() {
     glClearColor(0.0,0.0,0.0,0.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    for(row = 0; row < MAZE_ROWS; row++)
-    for(col = 0; col < MAZE_COLS; col++) {
+    for(row = 0; row < maze_rows; row++)
+    for(col = 0; col < maze_cols; col++) {
 
         switch (maze[row][col]) {
             case 0:
@@ -61,10 +86,10 @@ void display() {
 
         glBegin(GL_QUADS);
 
-        glVertex2i(col *  WIDTH/MAZE_COLS, HEIGHT - row * HEIGHT/MAZE_ROWS); 
-        glVertex2i(col*WIDTH/MAZE_COLS, HEIGHT - (row+1)*HEIGHT/MAZE_ROWS); 
-        glVertex2i((col+1)*WIDTH/MAZE_COLS, HEIGHT - (row+1)*HEIGHT/MAZE_ROWS); 
-        glVertex2i((col+1)*WIDTH/MAZE_COLS, HEIGHT - row*HEIGHT/MAZE_ROWS);
+        glVertex2i(col *  WIDTH/maze_cols, HEIGHT - row * HEIGHT/maze_rows); 
+        glVertex2i(col*WIDTH/maze_cols, HEIGHT - (row+1)*HEIGHT/maze_rows); 
+        glVertex2i((col+1)*WIDTH/maze_cols, HEIGHT - (row+1)*HEIGHT/maze_rows); 
+        glVertex2i((col+1)*WIDTH/maze_cols, HEIGHT - row*HEIGHT/maze_rows);
         
         glEnd();
     }
