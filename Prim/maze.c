@@ -65,7 +65,6 @@ void createHoles(int** maze) {
 
     for (int i = 0; i < MAX_HOLES; i++) {
         Point p = points[i];
-        printf("Point to be broken: %d, %d\n", p.row, p.col);
         maze[p.row][p.col] = 0;
     }
 

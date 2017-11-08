@@ -4,7 +4,7 @@
 #include "maze.h"
 
 
-#define WIDTH 1200
+// #define WIDTH 1200
 #define HEIGHT 600
 
 void display();
@@ -12,6 +12,7 @@ void display();
 int** maze = NULL;
 int maze_rows;
 int maze_cols;
+int WIDTH;
 
 int main(int argc, char * argv[]){
 
@@ -40,10 +41,20 @@ int main(int argc, char * argv[]){
 		exit( 1 );
     }
 
+    if (maze_rows == maze_cols) {
+        WIDTH = HEIGHT;
+    } else {
+        double ratio;
+        ratio = maze_cols/(double)maze_rows;
+        WIDTH = (int)(HEIGHT * ratio);
+    }
+
+    
+
 
     maze = generateMaze(maze_rows, maze_cols);
     
-    printMaze(maze, maze_rows, maze_cols);
+    // printMaze(maze, maze_rows, maze_cols);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
