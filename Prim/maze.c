@@ -14,6 +14,7 @@ int random_int(int min, int max);
 void generateStartingPoints(int** maze);   
 void encloseMaze(int** maze, int rows, int cols);  
 void randPrim(int** maze, int rows, int cols);    
+void printMaze(int** maze, int rows, int cols);    
 
 
 int MAZE_ROWS = 0;
@@ -23,6 +24,8 @@ typedef struct {
     int row;
     int col;
 } Point;
+
+Point* lastPos = NULL;
 
 int** generateMaze(int rows, int cols){
     MAZE_ROWS = rows;
@@ -36,6 +39,30 @@ int** generateMaze(int rows, int cols){
     createHoles(the_maze);   
 
     return the_maze;
+}
+
+void move(int** maze, int action){
+    Point* newPos;
+    if (lastPos != NULL) {
+        newPos->row = lastPos->row;
+        newPos->col = lastPos->col;
+    } else {
+        newPos->row = 1;
+        newPos->col = 1;
+    }
+    
+    switch (action) {    
+        case 27 :      break;
+        case 100 : newPos->col -= 1;   break;
+        case 102:  newPos->col += 1;  ;  break;
+        case 101   : newPos->row -= 1  ;  break;
+        case 103 : newPos->row += 1;  break;
+     } 
+
+     lastPos = newPos;
+
+    maze[newPos->row][newPos->col] = 2;
+     printMaze(maze, MAZE_ROWS,  MAZE_COLS);
 }
 
 void createHoles(int** maze) {

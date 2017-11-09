@@ -8,6 +8,9 @@
 #define HEIGHT 600
 
 void display();
+void keyboard(unsigned char c, int x, int y);    
+void specialKeys(int key, int x, int y);    
+void move(int** maze, int action);    
 
 int** maze = NULL;
 int maze_rows;
@@ -53,6 +56,12 @@ int main(int argc, char * argv[]){
 
 
     maze = generateMaze(maze_rows, maze_cols);
+    int mazeWithCharacters[maze_rows][maze_cols];
+    for(int row = 0; row < maze_rows; row++) {
+        for (int col = 0; col < maze_cols; col++) {
+            mazeWithCharacters[row][col] = maze[row][col];
+        }
+    }
     
     // printMaze(maze, maze_rows, maze_cols);
 
@@ -63,7 +72,9 @@ int main(int argc, char * argv[]){
     glutCreateWindow("MAZE");
     
     glutDisplayFunc(display);
-    // glutKeyboardFunc(keyboard);
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(specialKeys);
+    
     
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(0,WIDTH-1,0,HEIGHT-1);
@@ -107,3 +118,12 @@ void display() {
 
     glutSwapBuffers();
 }
+
+void keyboard(unsigned char c, int x, int y) {
+    printf("You pressed: %d\n", c);
+}
+
+void specialKeys(int key, int x, int y) {
+    move(maze, key);
+}
+
