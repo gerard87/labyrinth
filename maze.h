@@ -48,6 +48,7 @@ class Maze {
     
 
         bool move(int agentIndex, Directions direction);
+        Point getCurrentPosition(int agentIndex);
 
     private:
 
@@ -82,7 +83,6 @@ class Maze {
 
 
         // Game Helpers
-        Point getCurrentPosition(int agentIndex);
         bool agentInPosition(int agentIndex, Point pos);
         bool checkValidMove(int agentIndex, Point to);
 

@@ -77,20 +77,25 @@ void display() {
 
     for(int row = 0; row < maze.getRows(); row++)
     for(int col = 0; col < maze.getColumns(); col++) {
-        switch (maze.getValue(row,col)) {
-            case 0:
-                glColor3f(0.8, 0.8, 0.8);
-                break;        
-            case 1:
-                glColor3f(0.0 ,0.0, 0.8);
-                break;
-            case 2: 
-                glColor3f(0.0 ,0.8, 0.0);
-                break;
-            case 3: 
-                glColor3f(0.8 ,0.0, 0.1);
-                break;            
-        }
+        Maze::Point pos = Maze::Point(row, col);
+            if (pos == maze.getCurrentPosition(0)) {
+                glColor3f(0.8, 0.5, 0.0);
+            } else {
+            switch (maze.getValue(row,col)) {
+                case 0:
+                    glColor3f(0.8, 0.8, 0.8);
+                    break;        
+                case 1:
+                    glColor3f(0.0 ,0.0, 0.8);
+                    break;
+                case 2: 
+                    glColor3f(0.0 ,0.8, 0.0);
+                    break;
+                case 3: 
+                    glColor3f(0.8 ,0.0, 0.1);
+                    break;            
+            }
+            }
 
         glBegin(GL_QUADS);
 
@@ -122,5 +127,5 @@ void specialKeys(int key, int x, int y) {
             direction = Maze::UP;
             break;
     }
-    if (maze.move(0, direction)) maze.printMaze();
+    if (maze.move(0, direction)) glutPostRedisplay();
 }
