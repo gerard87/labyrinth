@@ -10,6 +10,8 @@ using namespace std;
 
 void display();
 void setScreenSize();
+void specialKeys(int key, int x, int y);    
+
 
 Maze maze;
 int WIDTH;
@@ -51,7 +53,7 @@ int main(int argc, char* argv[]) {
     
     glutDisplayFunc(display);
     //glutKeyboardFunc(keyboard);
-    //glutSpecialFunc(specialKeys);
+    glutSpecialFunc(specialKeys);
     
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(0,WIDTH-1,0,HEIGHT-1);
@@ -101,4 +103,24 @@ void display() {
     }
 
     glutSwapBuffers();
+}
+
+void specialKeys(int key, int x, int y) {
+    Maze::Directions direction;
+    switch (key) {
+        //case 27 :      break;
+        case 100:
+            direction = Maze::LEFT;
+            break;
+        case 102:
+            direction = Maze::RIGHT;
+            break;
+        case 101:
+            direction = Maze::DOWN;
+            break;
+        case 103:
+            direction = Maze::UP;
+            break;
+    }
+    if (maze.move(0, direction)) maze.printMaze();
 }

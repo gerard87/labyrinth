@@ -8,10 +8,27 @@ using namespace std;
 class Maze {
 
     public:
-        typedef struct {
+
+        enum Directions {
+            UP,
+            DOWN,
+            LEFT,
+            RIGHT
+        };
+
+        struct Point {
+            bool operator==(const Point& p) const {
+                return row == p.row && col == p.col; // or another approach as above
+            }
             int row;
             int col;
-        } Point;
+
+            Point() {}
+            Point(int row, int col) {
+                this->row = row;
+                this->col = col;
+            }
+        };
 
         Maze();
         Maze(int rows, int columns);
@@ -29,6 +46,9 @@ class Maze {
 
         int getValue(int row, int column);
     
+
+        bool move(int agentIndex, Directions direction);
+
     private:
 
         int rows;
@@ -36,6 +56,12 @@ class Maze {
         int** maze;
         int makeHoles;
         int makeHolesPercent = 18;
+
+        Point playerPosition;
+        Point enemyPosition;
+
+        Point playerBase;
+        Point enemyBase;
 
         std::vector<Maze::Point> walls;
 
@@ -53,5 +79,13 @@ class Maze {
         void encloseMaze();
         void setHolesQuantity();
         void removePoint(std::vector<Point> & points, int row, int col);
+
+
+        // Game Helpers
+        Point getCurrentPosition(int agentIndex);
+        bool agentInPosition(int agentIndex, Point pos);
+        bool checkValidMove(int agentIndex, Point to);
+
+
 
 }; 

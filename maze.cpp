@@ -47,6 +47,76 @@ bool Maze::isWall(int row, int col) {
     return this->maze[row][col] == 1;
 }
 
+bool Maze::agentInPosition(int agentIndex, Point pos) {
+    switch (agentIndex) {
+        case 0:
+            if (pos == this->enemyPosition) {
+                return true;
+            } else {
+                return false;
+            }
+        case 1: 
+            if (pos == this->playerPosition) {
+                return true;
+            } else {
+                return false;
+            }
+        default:
+            return false;
+    }
+}
+
+bool Maze::checkValidMove(int agentIndex, Point to) {
+    return (!isWall(to) && !agentInPosition(agentIndex, to));
+}
+
+Maze::Point Maze::getCurrentPosition(int agentIndex) {
+    if (agentIndex == 0) {
+        return this->playerPosition;
+    } else {
+        return this->enemyPosition;
+    }
+}
+
+// Maze game helpers.
+bool Maze::move(int agentIndex, Directions direction) {
+    Point p = getCurrentPosition(agentIndex);
+    int row = p.row;
+    int col = p.col;
+    switch (direction) {
+        case UP:
+            row += 1;
+            break;
+        case DOWN:
+            row -= 1;
+            break;
+        case LEFT:
+            col -= 1;
+            break;
+        case RIGHT:
+            col += 1;
+            break;
+        default:
+            return false;
+    }
+
+    Point newPos = Point(row, col);
+
+    if (checkValidMove(agentIndex, newPos)) {
+        if (agentIndex == 0) {
+            this->playerPosition = newPos;
+        } else {
+            this->enemyPosition = newPos;
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+// Maze generation helper methods.
+
 void Maze::generateMaze(){
     srand(time(NULL));    
     allocMaze(); 
@@ -54,7 +124,7 @@ void Maze::generateMaze(){
     encloseMaze();
     generateStartingPoints(); 
     setHolesQuantity();
-    createHoles();   
+    createHoles(); 
 }
 
 void Maze::setHolesQuantity() {
@@ -122,6 +192,10 @@ void Maze::generateStartingPoints() {
     for (int col = 1; col < this->columns - 1; col++) {
         if (this->maze[1][col] == 0) {
             this->maze[1][col] = 2;
+            this->playerPosition.row = 1;
+            this->playerPosition.col = col;
+            this->playerBase.row = 1;
+            this->playerBase.col = col;
             break;
         }
     }
@@ -129,6 +203,10 @@ void Maze::generateStartingPoints() {
     for (int col = this->columns - 1; col> 1; col--) {
         if (this->maze[this->rows-2][col] == 0) {
             this->maze[this->rows-2][col] = 3;
+            this->enemyPosition.row = this->rows-2;
+            this->enemyPosition.col = col;
+            this->enemyBase.row = this->rows-2;
+            this->enemyBase.col = col;
             break;
         }
     }
@@ -145,9 +223,6 @@ void Maze::encloseMaze(){
         maze[i][this->columns-1] = 1;
     }
 }
-
-
-
 
 void Maze::allocMaze(){ 
      // First, allocate the array of pointers to the columns
@@ -168,6 +243,10 @@ void Maze::allocMaze(){
 void Maze::printMaze() {
     for(int i = 0; i < this->rows; i++){  
         for(int k = 0; k < this->columns; k++){  
+            Point pos = Point(i, k);
+            if (pos == getCurrentPosition(0)) {
+                printf("ñ");
+            } else {
             switch(this->maze[i][k]){
                 case 3:
                     printf("C");
@@ -183,6 +262,7 @@ void Maze::printMaze() {
                     break;
              }
          }
+        }
         printf("\n");
     }
     printf("\n\n");
