@@ -129,12 +129,11 @@ void display() {
                 glVertex2i(player.x-square_height, player.y+square_widht);
                 glEnd();
 
-                glColor3f(0.8, 0.8, 0.8);
 
             }
 
         }
-        
+
     glutSwapBuffers();
 }
 
