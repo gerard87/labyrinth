@@ -466,3 +466,7 @@ void Maze::set_position(int agentIndex, int x, int y) {
     p->x = x;
     p->y = y;
 }
+
+Maze::Point Maze::getPlayerBase() {
+    return this->playerBase;
+}

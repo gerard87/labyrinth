@@ -15,6 +15,7 @@ void specialKeys(int key, int x, int y);
 void idle();
 int col_to_x(int col, int offset);
 int row_to_y(int row, int offset);
+void timer (int extra);
 
 
 Maze maze;
@@ -49,6 +50,8 @@ int main(int argc, char* argv[]) {
         maze = Maze(maze_rows, maze_cols);
     }
 
+    srand(time(NULL));
+
     setScreenSize();
 
     for(int i = 0; i < maze.getAgentsNum(); i++) {
@@ -66,14 +69,12 @@ int main(int argc, char* argv[]) {
     //glutKeyboardFunc(keyboard);
     glutSpecialFunc(specialKeys);
     glutIdleFunc(idle);
+    glutTimerFunc(0, timer, 0);
     
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(0,WIDTH-1,0,HEIGHT-1);
     
     glutMainLoop();
-
-
-        moveEnemy();
 
     return 0;
 }
@@ -132,23 +133,14 @@ void display() {
                 }
 
                 glBegin(GL_QUADS);
-                    glVertex2i(agent.x-square_height/2, agent.y-square_width/2); 
-                    glVertex2i(agent.x+square_height/2, agent.y-square_width/2); 
-                    glVertex2i(agent.x+square_height/2, agent.y+square_width/2); 
-                    glVertex2i(agent.x-square_height/2, agent.y+square_width/2);                    
+                glVertex2i(agent.x-square_height/2, agent.y-square_width/2); 
+                glVertex2i(agent.x+square_height/2, agent.y-square_width/2); 
+                glVertex2i(agent.x+square_height/2, agent.y+square_width/2); 
+                glVertex2i(agent.x-square_height/2, agent.y+square_width/2);                    
                 glEnd();
             }
         }
     glutSwapBuffers();
-}
-
-void moveEnemy() {
-    Maze::Directions direction = Maze::LEFT;
-    Maze::Point pos = maze.getCurrentPosition(1);
-    if (maze.move(1, direction)) {
-        maze.init_movement(1, col_to_x(pos.col, -1), row_to_y(pos.row, 0), 100);
-        glutPostRedisplay();
-    }
 }
 
 void specialKeys(int key, int x, int y) {
@@ -199,6 +191,51 @@ void idle() {
     last_t=t;
     
     glutPostRedisplay();
+}
+
+void timer (int extra) {
+    moveEnemy();
+    glutTimerFunc(60, timer, 0);
+}
+
+void moveEnemy() {
+    Maze::Directions direction;
+
+    Maze::Point pos = maze.getCurrentPosition(1);
+    //Maze::Point player_base = maze.getPlayerBase();
+
+    int col_offset;
+    int row_offset;
+
+    int result = rand() % 4;
+
+    switch(result) {
+        case 0:
+            direction = Maze::LEFT;
+            col_offset = -1;
+            row_offset = 0;
+            break;
+        case 1:
+            direction = Maze::RIGHT;
+            col_offset = 1;
+            row_offset = 0;
+            break;
+        case 2:
+            direction = Maze::UP;
+            col_offset = 0;
+            row_offset = -1;
+            break;
+        case 3:
+            direction = Maze::DOWN;
+            col_offset = 0;
+            row_offset = 1;
+            break;
+    }
+
+    if (maze.move(1, direction)) {
+        maze.init_movement(1, col_to_x(pos.col, col_offset), row_to_y(pos.row, row_offset), 100);
+        glutPostRedisplay();
+    }
 }
 
 int col_to_x(int col, int offset) {

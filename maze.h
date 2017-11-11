@@ -68,6 +68,8 @@ class Maze {
         void integrate(int agentIndex, long t);
         int getAgentsNum();
 
+        Point getPlayerBase();
+
     private:
 
         int rows;
