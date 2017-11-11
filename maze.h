@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <vector>
 
+#define MOVE 1
+#define QUIET 2
+
 using namespace std;
 
 class Maze {
@@ -23,10 +26,20 @@ class Maze {
             int row;
             int col;
 
-            Point() {}
+            float x, y;
+            float vx, vy;
+            int state;
+            long time_remaining;
+
+
+            Point() {
+                this->state = QUIET;
+            }
+
             Point(int row, int col) {
                 this->row = row;
                 this->col = col;
+                this->state = QUIET;
             }
         };
 
@@ -49,6 +62,10 @@ class Maze {
 
         bool move(int agentIndex, Directions direction);
         Point getCurrentPosition(int agentIndex);
+
+        void set_position(int agentIndex, int x, int y);
+        void init_movement(int agentIndex, int destination_x, int destination_y, int duration);
+        void integrate(int agentIndex, long t);
 
     private:
 

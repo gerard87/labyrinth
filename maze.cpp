@@ -4,6 +4,9 @@
 
 #include "maze.h"
 
+#define MOVE 1
+#define QUIET 2
+
 Maze::Maze() {}
 
 Maze::Maze(int rows, int columns) {
@@ -80,9 +83,10 @@ Maze::Point Maze::getCurrentPosition(int agentIndex) {
 
 // Maze game helpers.
 bool Maze::move(int agentIndex, Directions direction) {
-    Point p = getCurrentPosition(agentIndex);
-    int row = p.row;
-    int col = p.col;
+
+    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
+    int row = p->row;
+    int col = p->col;
     switch (direction) {
         case UP:
             row += 1;
@@ -99,15 +103,11 @@ bool Maze::move(int agentIndex, Directions direction) {
         default:
             return false;
     }
-
+    
     Point newPos = Point(row, col);
-
-    if (checkValidMove(agentIndex, newPos)) {
-        if (agentIndex == 0) {
-            this->playerPosition = newPos;
-        } else {
-            this->enemyPosition = newPos;
-        }
+    if (checkValidMove(agentIndex, newPos) && p->state == QUIET) {
+        p->col = col;
+        p->row = row;
         return true;
     } else {
         return false;
@@ -426,4 +426,37 @@ void Maze::randPrim() {
         wallListLength += addNearbyWalls(wallList,wallListLength,nextCell);
     }
 
+}
+
+void Maze::init_movement(int agentIndex, int destination_x, int destination_y, int duration) {
+
+    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
+
+    p->vx = (destination_x - p->x)/duration;
+    p->vy = (destination_y - p->y)/duration;
+
+    p->state = MOVE;
+    p->time_remaining = duration;
+}
+
+void Maze::integrate(int agentIndex, long t) {
+
+    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
+
+    if(p->state==MOVE && t<p->time_remaining) {
+        p->x += p->vx*t;
+        p->y += p->vy*t;
+        p->time_remaining-=t;
+    } else if(p->state==MOVE && t>=p->time_remaining) {
+        p->x += p->vx*p->time_remaining;
+        p->y += p->vy*p->time_remaining;
+        p->state=QUIET;
+    }
+    
+}
+
+void Maze::set_position(int agentIndex, int x, int y) {
+    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
+    p->x = x;
+    p->y = y;
 }
