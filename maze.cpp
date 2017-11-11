@@ -81,6 +81,10 @@ Maze::Point Maze::getCurrentPosition(int agentIndex) {
     }
 }
 
+int Maze::getAgentsNum() {
+    return this->agentsNum;
+}
+
 // Maze game helpers.
 bool Maze::move(int agentIndex, Directions direction) {
 
@@ -427,6 +431,8 @@ void Maze::randPrim() {
     }
 
 }
+
+
 
 void Maze::init_movement(int agentIndex, int destination_x, int destination_y, int duration) {
 

@@ -9,11 +9,12 @@
 using namespace std;
 
 void display();
+void moveEnemy();
 void setScreenSize();
 void specialKeys(int key, int x, int y);
 void idle();
-float col_to_x(int col, int offset);
-float row_to_y(int row, int offset);
+int col_to_x(int col, int offset);
+int row_to_y(int row, int offset);
 
 
 Maze maze;
@@ -50,8 +51,10 @@ int main(int argc, char* argv[]) {
 
     setScreenSize();
 
-    Maze::Point pos = maze.getCurrentPosition(0);
-    maze.set_position(0, col_to_x(pos.col, 0), row_to_y(pos.row, 0));
+    for(int i = 0; i < maze.getAgentsNum(); i++) {
+        Maze::Point pos = maze.getCurrentPosition(i);
+        maze.set_position(i, col_to_x(pos.col, 0), row_to_y(pos.row, 0));
+    }
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -68,6 +71,9 @@ int main(int argc, char* argv[]) {
     gluOrtho2D(0,WIDTH-1,0,HEIGHT-1);
     
     glutMainLoop();
+
+
+        moveEnemy();
 
     return 0;
 }
@@ -114,27 +120,35 @@ void display() {
             
             glEnd();
 
-            if (pos == maze.getCurrentPosition(0)) {
-
-                Maze::Point player = maze.getCurrentPosition(0);
-                float square_widht = (WIDTH/maze.getColumns())/2;
+            for(int i = 0; i < maze.getAgentsNum(); i++) {
+                Maze::Point agent = maze.getCurrentPosition(i);
+                float square_width = (WIDTH/maze.getColumns())/2;
                 float square_height = (HEIGHT/maze.getRows())/2;
 
-                glColor3f(0.8, 0.5, 0.0);
+                if (i == 0) {
+                    glColor3f(0.8, 0.5, 0.0);
+                } else {
+                    glColor3f(0.6, 0.1, 0.6);
+                }
 
                 glBegin(GL_QUADS);
-                glVertex2i(player.x-square_height, player.y-square_widht); 
-                glVertex2i(player.x+square_height, player.y-square_widht); 
-                glVertex2i(player.x+square_height, player.y+square_widht); 
-                glVertex2i(player.x-square_height, player.y+square_widht);
+                    glVertex2i(agent.x-square_height/2, agent.y-square_width/2); 
+                    glVertex2i(agent.x+square_height/2, agent.y-square_width/2); 
+                    glVertex2i(agent.x+square_height/2, agent.y+square_width/2); 
+                    glVertex2i(agent.x-square_height/2, agent.y+square_width/2);                    
                 glEnd();
-
-
             }
-
         }
-
     glutSwapBuffers();
+}
+
+void moveEnemy() {
+    Maze::Directions direction = Maze::LEFT;
+    Maze::Point pos = maze.getCurrentPosition(1);
+    if (maze.move(1, direction)) {
+        maze.init_movement(1, col_to_x(pos.col, -1), row_to_y(pos.row, 0), 100);
+        glutPostRedisplay();
+    }
 }
 
 void specialKeys(int key, int x, int y) {
@@ -174,20 +188,23 @@ void specialKeys(int key, int x, int y) {
 void idle() {
     long t;
     
-    t=glutGet(GLUT_ELAPSED_TIME); 
+    t = glutGet(GLUT_ELAPSED_TIME); 
 
-    if(last_t!=0)
+    if(last_t != 0) {
+        maze.integrate(1, t-last_t);
         maze.integrate(0, t-last_t);
+    } 
+
 
     last_t=t;
     
     glutPostRedisplay();
 }
 
-float col_to_x(int col, int offset) {
-    return (((col+offset)*WIDTH/maze.getColumns()) + ((col+1+offset)*WIDTH/maze.getColumns()))/2;
+int col_to_x(int col, int offset) {
+    return (int)(((col+offset)*WIDTH/maze.getColumns()) + ((col+1+offset)*WIDTH/maze.getColumns()))/2;
 }
 
-float row_to_y(int row, int offset) {
-    return ((HEIGHT - (row+offset)*HEIGHT/maze.getRows()) + (HEIGHT - (row+1+offset)*HEIGHT/maze.getRows()))/2;
+int row_to_y(int row, int offset) {
+    return (int)((HEIGHT - (row+offset)*HEIGHT/maze.getRows()) + (HEIGHT - (row+1+offset)*HEIGHT/maze.getRows()))/2;
 }

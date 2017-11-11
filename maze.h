@@ -66,6 +66,7 @@ class Maze {
         void set_position(int agentIndex, int x, int y);
         void init_movement(int agentIndex, int destination_x, int destination_y, int duration);
         void integrate(int agentIndex, long t);
+        int getAgentsNum();
 
     private:
 
@@ -74,6 +75,7 @@ class Maze {
         int** maze;
         int makeHoles;
         int makeHolesPercent = 18;
+        int agentsNum = 2;
 
         Point playerPosition;
         Point enemyPosition;
