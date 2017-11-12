@@ -16,7 +16,8 @@ class Maze {
             UP,
             DOWN,
             LEFT,
-            RIGHT
+            RIGHT,
+            STOP
         };
 
         struct Point {
@@ -69,6 +70,8 @@ class Maze {
         int getAgentsNum();
 
         Point getPlayerBase();
+
+        std::vector<Maze::Directions> getAvailableMoves(int agentIndex);
 
     private:
 

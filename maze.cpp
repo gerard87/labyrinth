@@ -81,6 +81,41 @@ Maze::Point Maze::getCurrentPosition(int agentIndex) {
     }
 }
 
+std::vector<Maze::Directions> Maze::getAvailableMoves(int agentIndex) {
+    std::vector<Maze::Directions> availableMoves;
+
+    Point pos = getCurrentPosition(agentIndex);
+    Point newPos;
+
+    newPos = Point(pos.row, pos.col + 1);
+    if (checkValidMove(agentIndex, newPos)) {
+        availableMoves.push_back(Maze::RIGHT);
+    }
+
+    newPos = Point(pos.row, pos.col - 1);
+    if (checkValidMove(agentIndex, newPos)) {
+        availableMoves.push_back(Maze::LEFT);
+    }
+
+    newPos = Point(pos.row + 1, pos.col);
+    if (checkValidMove(agentIndex, newPos)) {
+        availableMoves.push_back(Maze::DOWN);
+
+    }
+
+    newPos = Point(pos.row - 1, pos.col);
+    if (checkValidMove(agentIndex, newPos)) {
+        availableMoves.push_back(Maze::UP);
+    }
+
+    if (availableMoves.size() == 0) {
+        availableMoves.push_back(Maze::STOP);
+    }
+
+    return availableMoves;
+}
+
+
 int Maze::getAgentsNum() {
     return this->agentsNum;
 }
@@ -93,10 +128,10 @@ bool Maze::move(int agentIndex, Directions direction) {
     int col = p->col;
     switch (direction) {
         case UP:
-            row += 1;
+            row -= 1;
             break;
         case DOWN:
-            row -= 1;
+            row += 1;
             break;
         case LEFT:
             col -= 1;
@@ -104,6 +139,8 @@ bool Maze::move(int agentIndex, Directions direction) {
         case RIGHT:
             col += 1;
             break;
+        case STOP:
+            return true;
         default:
             return false;
     }

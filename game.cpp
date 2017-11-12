@@ -149,27 +149,25 @@ void specialKeys(int key, int x, int y) {
     int col_offset = 0;
     int row_offset = 0;
     switch (key) {
-        //case 27 :      break;
-        case 100:
+        case GLUT_KEY_LEFT:
             direction = Maze::LEFT;
             col_offset = -1;
             break;
-        case 102:
+        case GLUT_KEY_RIGHT:
             direction = Maze::RIGHT;
             col_offset = 1;
             break;
-        case 101:
-            direction = Maze::DOWN;
+        case GLUT_KEY_UP:
+            direction = Maze::UP;
             row_offset = -1;
             break;
-        case 103:
-            direction = Maze::UP;
+        case GLUT_KEY_DOWN:
+            direction = Maze::DOWN;
             row_offset = 1;
             break;
     }
     if (maze.move(0, direction)) {
         maze.init_movement(0, col_to_x(pos.col, col_offset), row_to_y(pos.row, row_offset), 100);
-        glutPostRedisplay();
     }
 }
 
@@ -197,36 +195,34 @@ void timer (int extra) {
 void moveEnemy() {
     Maze::Directions direction;
 
-    Maze::Point pos = maze.getCurrentPosition(1);
-    //Maze::Point player_base = maze.getPlayerBase();
+    for(int i = 1; i < maze.getAgentsNum(); i++) {
+        Maze::Point pos = maze.getCurrentPosition(i);
+        //Maze::Point player_base = maze.getPlayerBase();
 
-    int col_offset = 0;
-    int row_offset = 0;
+        int col_offset = 0;
+        int row_offset = 0;
 
-    int result = rand() % 4;
+        std::vector<Maze::Directions> moves = maze.getAvailableMoves(i);
+        direction = moves[rand() % moves.size()];
 
-    switch(result) {
-        case 0:
-            direction = Maze::LEFT;
-            col_offset = -1;
-            break;
-        case 1:
-            direction = Maze::RIGHT;
-            col_offset = 1;
-            break;
-        case 2:
-            direction = Maze::UP;
-            row_offset = 1;
-            break;
-        case 3:
-            direction = Maze::DOWN;
-            row_offset = -1;
-            break;
-    }
+        switch(direction) {
+            case Maze::LEFT:
+                col_offset = -1;
+                break;
+            case Maze::RIGHT:
+                col_offset = 1;
+                break;
+            case Maze::UP:
+                row_offset = -1;
+                break;
+            case Maze::DOWN:
+                row_offset = 1;
+                break;
+        }
 
-    if (maze.move(1, direction)) {
-        maze.init_movement(1, col_to_x(pos.col, col_offset), row_to_y(pos.row, row_offset), 100);
-        glutPostRedisplay();
+        if (maze.move(i, direction)) {
+            maze.init_movement(i, col_to_x(pos.col, col_offset), row_to_y(pos.row, row_offset), 100);
+        }
     }
 }
 
