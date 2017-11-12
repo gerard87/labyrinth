@@ -146,28 +146,24 @@ void display() {
 void specialKeys(int key, int x, int y) {
     Maze::Directions direction;
     Maze::Point pos = maze.getCurrentPosition(0);
-    int col_offset;
-    int row_offset;
+    int col_offset = 0;
+    int row_offset = 0;
     switch (key) {
         //case 27 :      break;
         case 100:
             direction = Maze::LEFT;
             col_offset = -1;
-            row_offset = 0;
             break;
         case 102:
             direction = Maze::RIGHT;
             col_offset = 1;
-            row_offset = 0;
             break;
         case 101:
             direction = Maze::DOWN;
-            col_offset = 0;
             row_offset = -1;
             break;
         case 103:
             direction = Maze::UP;
-            col_offset = 0;
             row_offset = 1;
             break;
     }
@@ -204,8 +200,8 @@ void moveEnemy() {
     Maze::Point pos = maze.getCurrentPosition(1);
     //Maze::Point player_base = maze.getPlayerBase();
 
-    int col_offset;
-    int row_offset;
+    int col_offset = 0;
+    int row_offset = 0;
 
     int result = rand() % 4;
 
@@ -213,22 +209,18 @@ void moveEnemy() {
         case 0:
             direction = Maze::LEFT;
             col_offset = -1;
-            row_offset = 0;
             break;
         case 1:
             direction = Maze::RIGHT;
             col_offset = 1;
-            row_offset = 0;
             break;
         case 2:
             direction = Maze::UP;
-            col_offset = 0;
-            row_offset = -1;
+            row_offset = 1;
             break;
         case 3:
             direction = Maze::DOWN;
-            col_offset = 0;
-            row_offset = 1;
+            row_offset = -1;
             break;
     }
 
