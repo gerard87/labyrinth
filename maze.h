@@ -3,26 +3,22 @@
 #include <algorithm>
 #include <vector>
 
+#include "directions.h"
+
 #define MOVE 1
 #define QUIET 2
 
 using namespace std;
 
+//class Directions;
+
 class Maze {
 
     public:
 
-        enum Directions {
-            UP,
-            DOWN,
-            LEFT,
-            RIGHT,
-            STOP
-        };
-
         struct Point {
             bool operator==(const Point& p) const {
-                return row == p.row && col == p.col; // or another approach as above
+                return row == p.row && col == p.col;
             }
             int row;
             int col;
@@ -61,7 +57,7 @@ class Maze {
         int getValue(int row, int column);
     
 
-        bool move(int agentIndex, Directions direction);
+        bool move(int agentIndex, Directions::Direction direction);
         Point getCurrentPosition(int agentIndex);
 
         void set_position(int agentIndex, int x, int y);
@@ -71,7 +67,9 @@ class Maze {
 
         Point getPlayerBase();
 
-        std::vector<Maze::Directions> getAvailableMoves(int agentIndex);
+        std::vector<Directions::Direction> getAvailableMoves(int agentIndex);
+
+        int manhattanDistance(Point a, Point b);
 
     private:
 

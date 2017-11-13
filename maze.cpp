@@ -81,35 +81,35 @@ Maze::Point Maze::getCurrentPosition(int agentIndex) {
     }
 }
 
-std::vector<Maze::Directions> Maze::getAvailableMoves(int agentIndex) {
-    std::vector<Maze::Directions> availableMoves;
+std::vector<Directions::Direction> Maze::getAvailableMoves(int agentIndex) {
+    std::vector<Directions::Direction> availableMoves;
 
     Point pos = getCurrentPosition(agentIndex);
     Point newPos;
 
     newPos = Point(pos.row, pos.col + 1);
     if (checkValidMove(agentIndex, newPos)) {
-        availableMoves.push_back(Maze::RIGHT);
+        availableMoves.push_back(Directions::RIGHT);
     }
 
     newPos = Point(pos.row, pos.col - 1);
     if (checkValidMove(agentIndex, newPos)) {
-        availableMoves.push_back(Maze::LEFT);
+        availableMoves.push_back(Directions::LEFT);
     }
 
     newPos = Point(pos.row + 1, pos.col);
     if (checkValidMove(agentIndex, newPos)) {
-        availableMoves.push_back(Maze::DOWN);
+        availableMoves.push_back(Directions::DOWN);
 
     }
 
     newPos = Point(pos.row - 1, pos.col);
     if (checkValidMove(agentIndex, newPos)) {
-        availableMoves.push_back(Maze::UP);
+        availableMoves.push_back(Directions::UP);
     }
 
     if (availableMoves.size() == 0) {
-        availableMoves.push_back(Maze::STOP);
+        availableMoves.push_back(Directions::STOP);
     }
 
     return availableMoves;
@@ -121,31 +121,13 @@ int Maze::getAgentsNum() {
 }
 
 // Maze game helpers.
-bool Maze::move(int agentIndex, Directions direction) {
+bool Maze::move(int agentIndex, Directions::Direction direction) {
 
     Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
     int row = p->row;
     int col = p->col;
-    switch (direction) {
-        case UP:
-            row -= 1;
-            break;
-        case DOWN:
-            row += 1;
-            break;
-        case LEFT:
-            col -= 1;
-            break;
-        case RIGHT:
-            col += 1;
-            break;
-        case STOP:
-            return true;
-        default:
-            return false;
-    }
     
-    Point newPos = Point(row, col);
+    Point newPos = Point(row += direction.y, col += direction.x);
     if (checkValidMove(agentIndex, newPos) && p->state == QUIET) {
         p->col = col;
         p->row = row;
@@ -506,4 +488,8 @@ void Maze::set_position(int agentIndex, int x, int y) {
 
 Maze::Point Maze::getPlayerBase() {
     return this->playerBase;
+}
+
+int Maze::manhattanDistance(Maze::Point a, Maze::Point b) {
+    return abs(a.col - b.col) + abs(a.row - b.row);
 }

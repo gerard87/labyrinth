@@ -3,10 +3,18 @@
 #include <GL/glut.h>
 
 #include "maze.h"
+#include "directions.h"
 
 #define HEIGHT 600
 
 using namespace std;
+
+
+Directions::Direction Directions::UP = Directions::Direction(0, -1);
+Directions::Direction Directions::DOWN = Directions::Direction(0, 1);
+Directions::Direction Directions::LEFT = Directions::Direction(-1, 0);
+Directions::Direction Directions::RIGHT = Directions::Direction(1, 0);
+Directions::Direction Directions::STOP = Directions::Direction(0, 0);
 
 void display();
 void moveEnemy();
@@ -144,30 +152,24 @@ void display() {
 }
 
 void specialKeys(int key, int x, int y) {
-    Maze::Directions direction;
+    Directions::Direction direction;
     Maze::Point pos = maze.getCurrentPosition(0);
-    int col_offset = 0;
-    int row_offset = 0;
     switch (key) {
         case GLUT_KEY_LEFT:
-            direction = Maze::LEFT;
-            col_offset = -1;
+            direction = Directions::LEFT;
             break;
         case GLUT_KEY_RIGHT:
-            direction = Maze::RIGHT;
-            col_offset = 1;
+            direction = Directions::RIGHT;
             break;
         case GLUT_KEY_UP:
-            direction = Maze::UP;
-            row_offset = -1;
+            direction = Directions::UP;
             break;
         case GLUT_KEY_DOWN:
-            direction = Maze::DOWN;
-            row_offset = 1;
+            direction = Directions::DOWN;
             break;
     }
     if (maze.move(0, direction)) {
-        maze.init_movement(0, col_to_x(pos.col, col_offset), row_to_y(pos.row, row_offset), 100);
+        maze.init_movement(0, col_to_x(pos.col, direction.x), row_to_y(pos.row, direction.y), 100);
     }
 }
 
@@ -177,8 +179,7 @@ void idle() {
     t = glutGet(GLUT_ELAPSED_TIME); 
 
     if(last_t != 0) {
-        maze.integrate(1, t-last_t);
-        maze.integrate(0, t-last_t);
+        for(int i = 0; i < maze.getAgentsNum(); i++) maze.integrate(i, t-last_t);
     } 
 
 
@@ -189,39 +190,34 @@ void idle() {
 
 void timer (int extra) {
     moveEnemy();
-    glutTimerFunc(60, timer, 0);
+    glutTimerFunc(100, timer, 0);
 }
 
 void moveEnemy() {
-    Maze::Directions direction;
+    Directions::Direction direction;
 
     for(int i = 1; i < maze.getAgentsNum(); i++) {
         Maze::Point pos = maze.getCurrentPosition(i);
-        //Maze::Point player_base = maze.getPlayerBase();
 
-        int col_offset = 0;
-        int row_offset = 0;
+        std::vector<Directions::Direction> moves = maze.getAvailableMoves(i);
+        std::vector<Directions::Direction> minMoves;
+        int minDistance = 9999999;
+        for(int j = 0; j < moves.size(); j++){
+            Directions::Direction d = moves[j];
 
-        std::vector<Maze::Directions> moves = maze.getAvailableMoves(i);
-        direction = moves[rand() % moves.size()];
-
-        switch(direction) {
-            case Maze::LEFT:
-                col_offset = -1;
-                break;
-            case Maze::RIGHT:
-                col_offset = 1;
-                break;
-            case Maze::UP:
-                row_offset = -1;
-                break;
-            case Maze::DOWN:
-                row_offset = 1;
-                break;
+            Maze::Point newPos = Maze::Point(pos.row + d.y, pos.col + d.x);
+            int manDistance = maze.manhattanDistance(maze.getPlayerBase(), newPos);
+            if (manDistance <= minDistance) {
+                minDistance = manDistance;
+                if (manDistance < minDistance) minMoves.clear();
+                minMoves.push_back(d);
+            }
         }
 
+        direction = minMoves[rand() % minMoves.size()];
+
         if (maze.move(i, direction)) {
-            maze.init_movement(i, col_to_x(pos.col, col_offset), row_to_y(pos.row, row_offset), 100);
+            maze.init_movement(i, col_to_x(pos.col, direction.x), row_to_y(pos.row, direction.y), 100);
         }
     }
 }
