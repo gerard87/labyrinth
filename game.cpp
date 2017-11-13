@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include <GL/glut.h>
 
 #include "maze.h"
@@ -10,12 +11,6 @@
 #define HEIGHT 600
 
 using namespace std;
-
-Directions::Direction Directions::UP = Directions::Direction(0, -1);
-Directions::Direction Directions::DOWN = Directions::Direction(0, 1);
-Directions::Direction Directions::LEFT = Directions::Direction(-1, 0);
-Directions::Direction Directions::RIGHT = Directions::Direction(1, 0);
-Directions::Direction Directions::STOP = Directions::Direction(0, 0);
 
 void display();
 void moveEnemy();
@@ -142,8 +137,9 @@ void display() {
                 }
 
                 glBegin(GL_QUADS);
-                int x = agent.getX();
-                int y = agent.getY();
+                float x = agent.getX();
+                float y = agent.getY();
+
                 glVertex2i(x-square_height/2, y-square_width/2); 
                 glVertex2i(x+square_height/2, y-square_width/2); 
                 glVertex2i(x+square_height/2, y+square_width/2); 
@@ -185,7 +181,6 @@ void idle() {
     if(last_t != 0) {
         for(int i = 0; i < maze.getAgentsNum(); i++) maze.getAgent(i).integrate(t-last_t);
     } 
-
 
     last_t=t;
     

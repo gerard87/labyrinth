@@ -1,3 +1,4 @@
+#include <iostream>
 #include "particle.h"
 
 Particle::Particle() {
@@ -9,11 +10,11 @@ Particle::Particle(int row, int col) {
     this->state = QUIET;
 }
 
-float getX() {
+float Particle::getX() {
     return this->x;
 }
 
-float getY() {
+float Particle::getY() {
     return this->y;
 }
 
@@ -46,7 +47,7 @@ void Particle::set_position(int x, int y) {
     this->y = y;
 }
 
-Point::Point Particle::getPosition() {
+Point Particle::getPosition() {
     return this->position;
 }
 

@@ -128,10 +128,12 @@ bool Maze::move(int agentIndex, Directions::Direction direction) {
     int row = p.getRow();
     int col = p.getCol();
     
-    Point newPos = Point(row += direction.y, col += direction.x);
+    Point newPos = Point(row + direction.y, col + direction.x);
     if (checkValidMove(agentIndex, newPos) && agent.getState() == Particle::QUIET) {
-        p.setCol(col);
-        p.setRow(row);
+        // p.setCol(col);
+        // p.setRow(row);
+        agent.setPoint(Point(row + direction.y, col + direction.x));
+        if (agentIndex == 0) printMaze();
         return true;
     } else {
         return false;
@@ -155,10 +157,7 @@ void Maze::setHolesQuantity() {
     for (int row = 1; row < this->rows - 1; row++) {
         for (int col = 1; col < this->columns - 2; col++) {
             if (this->isWall(row, col)) {
-                Point p;
-                p.setRow(row);
-                p.setCol(col);
-                this->walls.push_back(p);
+                this->walls.push_back(Point(row, col));
             }
         }  
     }
@@ -296,16 +295,14 @@ void Maze::removeIndex(Point* list, int length, int index){
 
 void Maze::removePoint(Point* list, int length, Point aPoint){
     for(int k = 0; k < length; k++){
-        if(list[k].getRow() == aPoint.getRow() && list[k].getCol() == aPoint.getCol())
-            return removeIndex(list, length, k);
+        if(list[k] == aPoint) return removeIndex(list, length, k);
     }
     printf("\n\n -- No such Point %d %d Unvisited  \n\n", aPoint.getRow(), aPoint.getCol());
 }
 
 int Maze::contains(Point* list,int length, Point aPoint){
     for(int k = 0; k < length; k++){
-        if(list[k].getRow() == aPoint.getRow() && list[k].getCol() == aPoint.getCol())
-            return 1;
+        if(list[k] ==aPoint) return 1;
     }
     return 0;
 }
@@ -402,7 +399,7 @@ void Maze::randPrim() {
             }
 
             if(nextWall.getCol() +1 < this->columns && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()+1)){
-                nextMove = Point(nextWall.getRow() -1, nextWall.getCol() + 1);
+                nextMove = Point(nextWall.getRow(), nextWall.getCol() + 1);
                 numNearUnvisited++;
             }
             
