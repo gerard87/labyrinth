@@ -6,7 +6,6 @@
 #include "maze.h"
 #include "directions.h"
 #include "utils.h"
-#include "point.h"
 
 #define HEIGHT 600
 
@@ -59,9 +58,17 @@ int main(int argc, char* argv[]) {
     setScreenSize();
 
     for(int i = 0; i < maze.getAgentsNum(); i++) {
-        Particle agent = maze.getAgent(i);
-        agent.set_position(col_to_x(agent.getPosition().getCol(), 0), row_to_y(agent.getPosition().getRow(), 0));
+        Point pos = maze.getAgent(i).getPosition();
+
+        int colX = col_to_x(pos.getCol(), 0);
+        int rowY = row_to_y(pos.getRow(), 0);
+        maze.getAgent(i).set_position(colX, rowY);
+
+        printf("Test: %f, %f\n", maze.getAgent(i).getX(), maze.getAgent(i).getY());
     }
+
+    printf("Test: %f, %f\n", maze.getAgent(0).getX(), maze.getAgent(0).getY());
+
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);

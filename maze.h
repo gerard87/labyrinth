@@ -5,7 +5,6 @@
 
 #include "directions.h"
 #include "particle.h"
-#include "point.h"
 
 using namespace std;
 
@@ -40,9 +39,6 @@ class Maze {
         Point getPlayerBase();
 
         std::vector<Directions::Direction> getAvailableMoves(int agentIndex);
-
-        // int manhattanDistance(Point a, Point b);
-
     private:
 
         int rows;
