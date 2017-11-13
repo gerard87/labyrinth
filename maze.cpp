@@ -3,6 +3,9 @@
 #include <random>
 
 #include "maze.h"
+#include "particle.h"
+#include "point.h"
+
 
 Maze::Maze() {}
 
@@ -71,14 +74,14 @@ bool Maze::checkValidMove(int agentIndex, Point to) {
 }
 
 Point Maze::getCurrentPosition(int agentIndex) {
-    return getAgent(agentIndex).getPosition();
+    return getAgent(agentIndex)->getPosition();
 }
 
-Particle Maze::getAgent(int agentIndex) {
+Particle* Maze::getAgent(int agentIndex) {
     if (agentIndex == 0) {
-        return this->playerParticle;
+        return &this->playerParticle;
     } else {
-        return this->enemyParticle;
+        return &this->enemyParticle;
     }
 }
 
@@ -123,21 +126,16 @@ int Maze::getAgentsNum() {
 
 // Maze game helpers.
 bool Maze::move(int agentIndex, Directions::Direction direction) {
-    Particle agent = getAgent(agentIndex);
-    Point p = agent.getPosition();
+    Particle* agent = getAgent(agentIndex);
+    Point p = agent->getPosition();
     int row = p.getRow();
     int col = p.getCol();
     
     Point newPos = Point(row + direction.y, col + direction.x);
-    if (checkValidMove(agentIndex, newPos) && agent.getState() == Particle::QUIET) {
-        // p.setCol(col);
-        // p.setRow(row);
-        agent.setPoint(Point(row + direction.y, col + direction.x));
-        if (agentIndex == 0) printMaze();
+    if (checkValidMove(agentIndex, newPos) && agent->getState() == Particle::QUIET) {
+        agent->setPoint(Point(row + direction.y, col + direction.x));
         return true;
-    } else {
-        return false;
-    }
+    } else return false;
 }
 
 
@@ -176,7 +174,6 @@ void Maze::createHoles() {
 
     std::random_device seed;
     std::mt19937 engine(seed());
-    // number distribution
     std::uniform_int_distribution<int> choose(0, this->walls.size() - 1);
     int holes = 0;
     

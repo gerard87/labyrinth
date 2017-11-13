@@ -32,7 +32,7 @@ class Maze {
     
         bool move(int agentIndex, Directions::Direction direction);
         Point getCurrentPosition(int agentIndex);
-        Particle getAgent(int agentIndex);
+        Particle* getAgent(int agentIndex);
 
         int getAgentsNum();
 

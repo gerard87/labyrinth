@@ -1,3 +1,6 @@
+#ifndef PARTICLE_H
+#define PARTICLE_H
+
 #include "point.h"
 
 class Particle {
@@ -31,4 +34,5 @@ class Particle {
         void setPoint(Point p);
         float getX();
         float getY();
-};
+    };
+    #endif

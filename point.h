@@ -3,7 +3,6 @@
 
 class Point {
     private:
-        
         int row;
         int col;
 

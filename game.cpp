@@ -58,17 +58,12 @@ int main(int argc, char* argv[]) {
     setScreenSize();
 
     for(int i = 0; i < maze.getAgentsNum(); i++) {
-        Point pos = maze.getAgent(i).getPosition();
+        Point pos = maze.getAgent(i)->getPosition();
 
         int colX = col_to_x(pos.getCol(), 0);
         int rowY = row_to_y(pos.getRow(), 0);
-        maze.getAgent(i).set_position(colX, rowY);
-
-        printf("Test: %f, %f\n", maze.getAgent(i).getX(), maze.getAgent(i).getY());
+        maze.getAgent(i)->set_position(colX, rowY);
     }
-
-    printf("Test: %f, %f\n", maze.getAgent(0).getX(), maze.getAgent(0).getY());
-
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -133,7 +128,7 @@ void display() {
             glEnd();
 
             for(int i = 0; i < maze.getAgentsNum(); i++) {
-                Particle agent = maze.getAgent(i);
+                Particle* agent = maze.getAgent(i);
                 float square_width = (WIDTH/maze.getColumns())/2;
                 float square_height = (HEIGHT/maze.getRows())/2;
 
@@ -144,8 +139,8 @@ void display() {
                 }
 
                 glBegin(GL_QUADS);
-                float x = agent.getX();
-                float y = agent.getY();
+                float x = agent->getX();
+                float y = agent->getY();
 
                 glVertex2i(x-square_height/2, y-square_width/2); 
                 glVertex2i(x+square_height/2, y-square_width/2); 
@@ -159,8 +154,8 @@ void display() {
 
 void specialKeys(int key, int x, int y) {
     Directions::Direction direction;
-    Particle agent = maze.getAgent(0);
-    Point pos = agent.getPosition();
+    Particle* agent = maze.getAgent(0);
+    Point pos = agent->getPosition();
     switch (key) {
         case GLUT_KEY_LEFT:
             direction = Directions::LEFT;
@@ -176,7 +171,7 @@ void specialKeys(int key, int x, int y) {
             break;
     }
     if (maze.move(0, direction)) {
-        agent.init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
+        agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
     }
 }
 
@@ -186,7 +181,7 @@ void idle() {
     t = glutGet(GLUT_ELAPSED_TIME); 
 
     if(last_t != 0) {
-        for(int i = 0; i < maze.getAgentsNum(); i++) maze.getAgent(i).integrate(t-last_t);
+        for(int i = 0; i < maze.getAgentsNum(); i++) maze.getAgent(i)->integrate(t-last_t);
     } 
 
     last_t=t;
@@ -203,8 +198,8 @@ void moveEnemy() {
     Directions::Direction direction;
 
     for(int i = 1; i < maze.getAgentsNum(); i++) {
-        Particle agent = maze.getAgent(i);
-        Point pos = agent.getPosition();
+        Particle* agent = maze.getAgent(i);
+        Point pos = agent->getPosition();
 
         std::vector<Directions::Direction> moves = maze.getAvailableMoves(i);
         std::vector<Directions::Direction> minMoves;
@@ -224,7 +219,7 @@ void moveEnemy() {
         direction = minMoves[rand() % minMoves.size()];
 
         if (maze.move(i, direction)) {
-            agent.init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
+            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
         }
     }
 }
