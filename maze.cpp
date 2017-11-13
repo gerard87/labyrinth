@@ -42,8 +42,8 @@ int Maze::getValue(int row, int column) {
     return this->maze[row][column];
 }
 
-bool Maze::isWall(Maze::Point p) {
-    return this->maze[p.row][p.col] == 1;
+bool Maze::isWall(Point p) {
+    return this->maze[p.getRow()][p.getCol()] == 1;
 }
 
 bool Maze::isWall(int row, int col) {
@@ -73,7 +73,7 @@ bool Maze::checkValidMove(int agentIndex, Point to) {
     return (!isWall(to) && !agentInPosition(agentIndex, to));
 }
 
-Maze::Point Maze::getCurrentPosition(int agentIndex) {
+Point Maze::getCurrentPosition(int agentIndex) {
     if (agentIndex == 0) {
         return this->playerPosition;
     } else {
@@ -87,23 +87,23 @@ std::vector<Directions::Direction> Maze::getAvailableMoves(int agentIndex) {
     Point pos = getCurrentPosition(agentIndex);
     Point newPos;
 
-    newPos = Point(pos.row, pos.col + 1);
+    newPos = Point(pos.getRow(), pos.getCol() + 1);
     if (checkValidMove(agentIndex, newPos)) {
         availableMoves.push_back(Directions::RIGHT);
     }
 
-    newPos = Point(pos.row, pos.col - 1);
+    newPos = Point(pos.getRow(), pos.getCol() - 1);
     if (checkValidMove(agentIndex, newPos)) {
         availableMoves.push_back(Directions::LEFT);
     }
 
-    newPos = Point(pos.row + 1, pos.col);
+    newPos = Point(pos.getRow() + 1, pos.getCol());
     if (checkValidMove(agentIndex, newPos)) {
         availableMoves.push_back(Directions::DOWN);
 
     }
 
-    newPos = Point(pos.row - 1, pos.col);
+    newPos = Point(pos.getRow() - 1, pos.getCol());
     if (checkValidMove(agentIndex, newPos)) {
         availableMoves.push_back(Directions::UP);
     }
@@ -123,12 +123,12 @@ int Maze::getAgentsNum() {
 // Maze game helpers.
 bool Maze::move(int agentIndex, Directions::Direction direction) {
 
-    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
-    int row = p->row;
-    int col = p->col;
+    Point p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
+    int row = p.getRow();
+    int col = p.getCol();
     
     Point newPos = Point(row += direction.y, col += direction.x);
-    if (checkValidMove(agentIndex, newPos) && p->state == QUIET) {
+    if (checkValidMove(agentIndex, newPos) && getAgent(agentIndex).getState() == Particle::QUIET) {
         p->col = col;
         p->row = row;
         return true;
@@ -155,8 +155,8 @@ void Maze::setHolesQuantity() {
         for (int col = 1; col < this->columns - 2; col++) {
             if (this->isWall(row, col)) {
                 Point p;
-                p.row = row;
-                p.col = col;
+                p.getRow() = row;
+                p.getCol() = col;
                 this->walls.push_back(p);
             }
         }  
@@ -167,7 +167,7 @@ void Maze::setHolesQuantity() {
 void Maze::removePoint(std::vector<Point> & points, int row, int col) {
     points.erase(
         std::remove_if(points.begin(), points.end(), [&](Point const & point) {
-            return point.row == row && point.col == col;
+            return point.getRow() == row && point.getCol() == col;
         }),
         points.end());
 }
@@ -190,10 +190,10 @@ void Maze::createHoles() {
             is_wall = 0;
             p = this->walls[choose(engine)];
             if (isWall(p) &&
-                        ((p.row - 1) > 0 && isWall(p.row - 1, p.col)) && 
-                        ((p.row + 1) < (this->rows - 1) && isWall(p.row + 1, p.col)) &&
-                        ((p.col - 1) > 0 && isWall(p.row, p.col - 1)) &&
-                        ((p.col + 1) < (this->columns - 1) && isWall(p.row, p.col + 1))
+                        ((p.getRow() - 1) > 0 && isWall(p.getRow() - 1, p.getCol())) && 
+                        ((p.getRow() + 1) < (this->rows - 1) && isWall(p.getRow() + 1, p.getCol())) &&
+                        ((p.getCol() - 1) > 0 && isWall(p.getRow(), p.getCol() - 1)) &&
+                        ((p.getCol() + 1) < (this->columns - 1) && isWall(p.getRow(), p.getCol() + 1))
                     ) 
             {
                 continue;
@@ -201,8 +201,8 @@ void Maze::createHoles() {
                 is_wall = 1;
             }
         } while (!is_wall);
-        removePoint(this->walls, p.row, p.col);
-        this->maze[p.row][p.col] = 0;
+        removePoint(this->walls, p.getRow(), p.getCol());
+        this->maze[p.getRow()][p.getCol()] = 0;
         generated_points++;
     }
 }
@@ -215,10 +215,10 @@ void Maze::generateStartingPoints() {
     for (int col = 1; col < this->columns - 1; col++) {
         if (this->maze[1][col] == 0) {
             this->maze[1][col] = 2;
-            this->playerPosition.row = 1;
-            this->playerPosition.col = col;
-            this->playerBase.row = 1;
-            this->playerBase.col = col;
+            this->playerPosition.getRow() = 1;
+            this->playerPosition.getCol() = col;
+            this->playerBase.getRow() = 1;
+            this->playerBase.getCol() = col;
             break;
         }
     }
@@ -226,10 +226,10 @@ void Maze::generateStartingPoints() {
     for (int col = this->columns - 1; col> 1; col--) {
         if (this->maze[this->rows-2][col] == 0) {
             this->maze[this->rows-2][col] = 3;
-            this->enemyPosition.row = this->rows-2;
-            this->enemyPosition.col = col;
-            this->enemyBase.row = this->rows-2;
-            this->enemyBase.col = col;
+            this->enemyPosition.getRow() = this->rows-2;
+            this->enemyPosition.getCol() = col;
+            this->enemyBase.getRow() = this->rows-2;
+            this->enemyBase.getCol() = col;
             break;
         }
     }
@@ -299,15 +299,15 @@ void Maze::removeIndex(Point* list, int length, int index){
 
 void Maze::removePoint(Point* list, int length, Point aPoint){
     for(int k = 0; k < length; k++){
-        if(list[k].row == aPoint.row && list[k].col == aPoint.col)
+        if(list[k].getRow() == aPoint.getRow() && list[k].getCol() == aPoint.getCol())
             return removeIndex(list, length, k);
     }
-    printf("\n\n -- No such Point %d %d Unvisited  \n\n", aPoint.row, aPoint.col);
+    printf("\n\n -- No such Point %d %d Unvisited  \n\n", aPoint.getRow(), aPoint.getCol());
 }
 
 int Maze::contains(Point* list,int length, Point aPoint){
     for(int k = 0; k < length; k++){
-        if(list[k].row == aPoint.row && list[k].col == aPoint.col)
+        if(list[k].getRow() == aPoint.getRow() && list[k].getCol() == aPoint.getCol())
             return 1;
     }
     return 0;
@@ -315,53 +315,53 @@ int Maze::contains(Point* list,int length, Point aPoint){
 
 int Maze::containsAlt(Point* list, int length, int row, int col){
     Point theCell;
-    theCell.row = row;
-    theCell.col = col;
+    theCell.getRow() = row;
+    theCell.getCol() = col;
     
     return contains(list, length, theCell);
 }
 
 int Maze::addNearbyWalls(Point* list, int length, Point aPoint){
     int originalLength = length;
-    if(aPoint.row -1  >= 0){
+    if(aPoint.getRow() -1  >= 0){
         Point thisWall;
-        thisWall.row = aPoint.row -1;
-        thisWall.col = aPoint.col;
+        thisWall.getRow() = aPoint.getRow() -1;
+        thisWall.getCol() = aPoint.getCol();
        //If it is a wall, and is not already in the list, add it to the list 
-        if(this->maze[thisWall.row][thisWall.col] && !contains(list, length, thisWall)){
+        if(this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)){
             list[length] = thisWall;
             length++;
         }
     }
 
-    if(aPoint.row + 1 < this->rows){
+    if(aPoint.getRow() + 1 < this->rows){
         Point thisWall;
-        thisWall.row = aPoint.row +1;
-        thisWall.col = aPoint.col;
+        thisWall.getRow() = aPoint.getRow() +1;
+        thisWall.getCol() = aPoint.getCol();
 
-        if(this->maze[thisWall.row][thisWall.col] && !contains(list, length, thisWall)){
+        if(this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)){
             list[length] = thisWall;
             length++;
         }
     }
 
-    if (aPoint.col -1 >= 0) {
+    if (aPoint.getCol() -1 >= 0) {
         Point thisWall;
-        thisWall.row = aPoint.row;
-        thisWall.col = aPoint.col-1;
+        thisWall.getRow() = aPoint.getRow();
+        thisWall.getCol() = aPoint.getCol()-1;
 
-        if(this->maze[thisWall.row][thisWall.col] && !contains(list, length, thisWall)){
+        if(this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)){
             list[length] = thisWall;
             length++;
         }
     }
 
-    if (aPoint.col + 1 < this->columns) {
+    if (aPoint.getCol() + 1 < this->columns) {
         Point thisWall;
-        thisWall.row = aPoint.row;
-        thisWall.col = aPoint.col+1;
+        thisWall.getRow() = aPoint.getRow();
+        thisWall.getCol() = aPoint.getCol()+1;
         
-        if (this->maze[thisWall.row][thisWall.col] && !contains(list, length, thisWall)) {
+        if (this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)) {
             list[length] = thisWall;
             length++;
         }
@@ -384,8 +384,8 @@ void Maze::randPrim() {
         for(int k = 0; k < this->columns; k++){
             if(this->maze[i][k] == 0){
                 Point nextPoint;
-                nextPoint.row = i;
-                nextPoint.col = k;
+                nextPoint.getRow() = i;
+                nextPoint.getCol() = k;
                 unvisited[unvisitedIndex] = nextPoint;
                 unvisitedIndex++;
             }
@@ -403,35 +403,35 @@ void Maze::randPrim() {
             Point nextMove; 
 
             //If the next position is valid and unvisited
-            if(nextWall.row -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.row-1, nextWall.col)){
+            if(nextWall.getRow() -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()-1, nextWall.getCol())){
                 //set it to the next move, increment numNearUnvisited
-                nextMove.row = nextWall.row -1;
-                nextMove.col = nextWall.col;
+                nextMove.getRow() = nextWall.getRow() -1;
+                nextMove.getCol() = nextWall.getCol();
                 numNearUnvisited++;
             }
 
-            if(nextWall.row +1 < this->rows && containsAlt(unvisited, unvisitedIndex, nextWall.row+1, nextWall.col)){
-                nextMove.row = nextWall.row+1;
-                nextMove.col = nextWall.col;
+            if(nextWall.getRow() +1 < this->rows && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()+1, nextWall.getCol())){
+                nextMove.getRow() = nextWall.getRow()+1;
+                nextMove.getCol() = nextWall.getCol();
                 numNearUnvisited++;
             }
 
-            if(nextWall.col -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.row, nextWall.col-1)){
-                nextMove.row = nextWall.row;
-                nextMove.col = nextWall.col-1;
+            if(nextWall.getCol() -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()-1)){
+                nextMove.getRow() = nextWall.getRow();
+                nextMove.getCol() = nextWall.getCol()-1;
                 numNearUnvisited++;
             }
 
-            if(nextWall.col +1 < this->columns && containsAlt(unvisited, unvisitedIndex, nextWall.row, nextWall.col+1)){
-                nextMove.row = nextWall.row;
-                nextMove.col = nextWall.col+1;
+            if(nextWall.getCol() +1 < this->columns && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()+1)){
+                nextMove.getRow() = nextWall.getRow();
+                nextMove.getCol() = nextWall.getCol()+1;
                 numNearUnvisited++;
             }
             
             //If there is only one unvisited cell by the wall, make a passage
             //Then add the neighboring walls of that cell to the wall list
             if(numNearUnvisited == 1){
-                this->maze[nextWall.row][nextWall.col] = 0;
+                this->maze[nextWall.getRow()][nextWall.getCol()] = 0;
                 removePoint(unvisited, unvisitedIndex, nextMove);
                 unvisitedIndex -= 1;
                 wallListLength += addNearbyWalls(wallList, wallListLength, nextMove);
@@ -451,45 +451,10 @@ void Maze::randPrim() {
 
 }
 
-
-
-void Maze::init_movement(int agentIndex, int destination_x, int destination_y, int duration) {
-
-    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
-
-    p->vx = (destination_x - p->x)/duration;
-    p->vy = (destination_y - p->y)/duration;
-
-    p->state = MOVE;
-    p->time_remaining = duration;
-}
-
-void Maze::integrate(int agentIndex, long t) {
-
-    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
-
-    if(p->state==MOVE && t<p->time_remaining) {
-        p->x += p->vx*t;
-        p->y += p->vy*t;
-        p->time_remaining-=t;
-    } else if(p->state==MOVE && t>=p->time_remaining) {
-        p->x += p->vx*p->time_remaining;
-        p->y += p->vy*p->time_remaining;
-        p->state=QUIET;
-    }
-    
-}
-
-void Maze::set_position(int agentIndex, int x, int y) {
-    Point *p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
-    p->x = x;
-    p->y = y;
-}
-
-Maze::Point Maze::getPlayerBase() {
+Point Maze::getPlayerBase() {
     return this->playerBase;
 }
 
-int Maze::manhattanDistance(Maze::Point a, Maze::Point b) {
-    return abs(a.col - b.col) + abs(a.row - b.row);
-}
+// int Maze::manhattanDistance(Maze::Point a, Maze::Point b) {
+//     return abs(a.getCol() - b.getCol()) + abs(a.getRow() - b.getRow());
+// }

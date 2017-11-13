@@ -4,11 +4,12 @@
 
 #include "maze.h"
 #include "directions.h"
+#include "utils.h"
+#include "point.h"
 
 #define HEIGHT 600
 
 using namespace std;
-
 
 Directions::Direction Directions::UP = Directions::Direction(0, -1);
 Directions::Direction Directions::DOWN = Directions::Direction(0, 1);
@@ -63,7 +64,7 @@ int main(int argc, char* argv[]) {
     setScreenSize();
 
     for(int i = 0; i < maze.getAgentsNum(); i++) {
-        Maze::Point pos = maze.getCurrentPosition(i);
+        Point pos = maze.getCurrentPosition(i);
         maze.set_position(i, col_to_x(pos.col, 0), row_to_y(pos.row, 0));
     }
 
@@ -103,7 +104,7 @@ void display() {
 
     for(int row = 0; row < maze.getRows(); row++)
         for(int col = 0; col < maze.getColumns(); col++) {
-            Maze::Point pos = Maze::Point(row, col);
+            Point pos = Point(row, col);
             
             switch (maze.getValue(row,col)) {
                 case 0:
@@ -130,7 +131,7 @@ void display() {
             glEnd();
 
             for(int i = 0; i < maze.getAgentsNum(); i++) {
-                Maze::Point agent = maze.getCurrentPosition(i);
+                Particle agent = maze.getCurrentPosition(i);
                 float square_width = (WIDTH/maze.getColumns())/2;
                 float square_height = (HEIGHT/maze.getRows())/2;
 
@@ -153,7 +154,7 @@ void display() {
 
 void specialKeys(int key, int x, int y) {
     Directions::Direction direction;
-    Maze::Point pos = maze.getCurrentPosition(0);
+    Point pos = maze.getCurrentPosition(0);
     switch (key) {
         case GLUT_KEY_LEFT:
             direction = Directions::LEFT;
@@ -169,7 +170,7 @@ void specialKeys(int key, int x, int y) {
             break;
     }
     if (maze.move(0, direction)) {
-        maze.init_movement(0, col_to_x(pos.col, direction.x), row_to_y(pos.row, direction.y), 100);
+        maze.init_movement(0, col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
     }
 }
 
@@ -197,7 +198,7 @@ void moveEnemy() {
     Directions::Direction direction;
 
     for(int i = 1; i < maze.getAgentsNum(); i++) {
-        Maze::Point pos = maze.getCurrentPosition(i);
+        Point pos = maze.getCurrentPosition(i);
 
         std::vector<Directions::Direction> moves = maze.getAvailableMoves(i);
         std::vector<Directions::Direction> minMoves;
@@ -205,8 +206,8 @@ void moveEnemy() {
         for(int j = 0; j < moves.size(); j++){
             Directions::Direction d = moves[j];
 
-            Maze::Point newPos = Maze::Point(pos.row + d.y, pos.col + d.x);
-            int manDistance = maze.manhattanDistance(maze.getPlayerBase(), newPos);
+            Point newPos = Point(pos.getRow() + d.y, pos.getCol() + d.x);
+            int manDistance = Utils::manhattanDistance(maze.getPlayerBase(), newPos);
             if (manDistance <= minDistance) {
                 minDistance = manDistance;
                 if (manDistance < minDistance) minMoves.clear();
@@ -217,7 +218,7 @@ void moveEnemy() {
         direction = minMoves[rand() % minMoves.size()];
 
         if (maze.move(i, direction)) {
-            maze.init_movement(i, col_to_x(pos.col, direction.x), row_to_y(pos.row, direction.y), 100);
+            maze.init_movement(i, col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
         }
     }
 }
