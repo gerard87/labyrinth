@@ -53,10 +53,7 @@ class Maze {
         int** maze;
         int makeHoles;
         int makeHolesPercent = 18;
-        int agentsNum = 2;
-
-        Point playerPosition;
-        Point enemyPosition;
+        int agentsNum = 2;        
 
         Particle playerParticle;
         Particle enemyParticle;

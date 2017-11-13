@@ -4,9 +4,6 @@
 
 #include "maze.h"
 
-#define MOVE 1
-#define QUIET 2
-
 Maze::Maze() {}
 
 Maze::Maze(int rows, int columns) {
@@ -53,13 +50,13 @@ bool Maze::isWall(int row, int col) {
 bool Maze::agentInPosition(int agentIndex, Point pos) {
     switch (agentIndex) {
         case 0:
-            if (pos == this->enemyPosition) {
+            if (pos == this->enemyParticle.getPosition()) {
                 return true;
             } else {
                 return false;
             }
         case 1: 
-            if (pos == this->playerPosition) {
+            if (pos == this->playerParticle.getPosition()) {
                 return true;
             } else {
                 return false;
@@ -74,10 +71,14 @@ bool Maze::checkValidMove(int agentIndex, Point to) {
 }
 
 Point Maze::getCurrentPosition(int agentIndex) {
+    return getAgent(agentIndex).getPosition();
+}
+
+Particle Maze::getAgent(int agentIndex) {
     if (agentIndex == 0) {
-        return this->playerPosition;
+        return this->playerParticle;
     } else {
-        return this->enemyPosition;
+        return this->enemyParticle;
     }
 }
 
@@ -122,15 +123,15 @@ int Maze::getAgentsNum() {
 
 // Maze game helpers.
 bool Maze::move(int agentIndex, Directions::Direction direction) {
-
-    Point p = agentIndex == 0 ? &this->playerPosition : &this->enemyPosition;
+    Particle agent = getAgent(agentIndex);
+    Point p = agent.getPosition();
     int row = p.getRow();
     int col = p.getCol();
     
     Point newPos = Point(row += direction.y, col += direction.x);
-    if (checkValidMove(agentIndex, newPos) && getAgent(agentIndex).getState() == Particle::QUIET) {
-        p->col = col;
-        p->row = row;
+    if (checkValidMove(agentIndex, newPos) && agent.getState() == Particle::QUIET) {
+        p.setCol(col);
+        p.setRow(row);
         return true;
     } else {
         return false;
@@ -155,8 +156,8 @@ void Maze::setHolesQuantity() {
         for (int col = 1; col < this->columns - 2; col++) {
             if (this->isWall(row, col)) {
                 Point p;
-                p.getRow() = row;
-                p.getCol() = col;
+                p.setRow(row);
+                p.setCol(col);
                 this->walls.push_back(p);
             }
         }  
@@ -166,7 +167,7 @@ void Maze::setHolesQuantity() {
 
 void Maze::removePoint(std::vector<Point> & points, int row, int col) {
     points.erase(
-        std::remove_if(points.begin(), points.end(), [&](Point const & point) {
+        std::remove_if(points.begin(), points.end(), [&](Point /* const */ & point) {
             return point.getRow() == row && point.getCol() == col;
         }),
         points.end());
@@ -215,10 +216,8 @@ void Maze::generateStartingPoints() {
     for (int col = 1; col < this->columns - 1; col++) {
         if (this->maze[1][col] == 0) {
             this->maze[1][col] = 2;
-            this->playerPosition.getRow() = 1;
-            this->playerPosition.getCol() = col;
-            this->playerBase.getRow() = 1;
-            this->playerBase.getCol() = col;
+            this->playerParticle.setPoint(Point(1, col));
+            this->playerBase = Point(1, col);
             break;
         }
     }
@@ -226,10 +225,8 @@ void Maze::generateStartingPoints() {
     for (int col = this->columns - 1; col> 1; col--) {
         if (this->maze[this->rows-2][col] == 0) {
             this->maze[this->rows-2][col] = 3;
-            this->enemyPosition.getRow() = this->rows-2;
-            this->enemyPosition.getCol() = col;
-            this->enemyBase.getRow() = this->rows-2;
-            this->enemyBase.getCol() = col;
+            this->enemyParticle.setPoint(Point(this->rows-2, col));
+            this->enemyBase = Point(this->rows-2, col);
             break;
         }
     }

@@ -1,11 +1,15 @@
+#include "point.h"
+
 class Particle {
 
     private:
-        bool operator==(const Particle& p) const {
-            return row == p.row && col == p.col;
-        }
-        int row;
-        int col;
+        // bool operator==(const Particle& p) const {
+        //     return row == p.row && col == p.col;
+        // }
+        // int row;
+        // int col;
+
+        Point position;
 
         float x, y;
         float vx, vy;
@@ -23,4 +27,6 @@ class Particle {
         void integrate(long t);
         void draw();
         int getState();
+        Point getPosition();
+        void setPoint(Point p);
 };

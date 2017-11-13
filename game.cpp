@@ -64,8 +64,9 @@ int main(int argc, char* argv[]) {
     setScreenSize();
 
     for(int i = 0; i < maze.getAgentsNum(); i++) {
-        Point pos = maze.getCurrentPosition(i);
-        maze.set_position(i, col_to_x(pos.col, 0), row_to_y(pos.row, 0));
+        Point position = maze.getCurrentPosition(i);
+        Agent agent = maze.getAgent(i);
+        agent.set_position(col_to_x(agent.getPosition().getCol(), 0), row_to_y(agent.getPosition().getRow(), 0));
     }
 
     glutInit(&argc, argv);

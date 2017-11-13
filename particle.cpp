@@ -5,8 +5,7 @@ Particle::Particle() {
 }
 
 Particle::Particle(int row, int col) {
-    this->row = row;
-    this->col = col;
+    this->position = Point(row, col);
     this->state = QUIET;
 }
 
@@ -37,4 +36,12 @@ void Particle::integrate(long t) {
 void Particle::set_position(int x, int y) {
     this->x = x;
     this->y = y;
+}
+
+Point::Point Particle::getPosition() {
+    return this->position;
+}
+
+void Particle::setPoint(Point p) {
+    this->position = p;
 }
