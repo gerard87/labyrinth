@@ -29,4 +29,6 @@ class Particle {
         int getState();
         Point getPosition();
         void setPoint(Point p);
+        float getX();
+        float getY();
 };

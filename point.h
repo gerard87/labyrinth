@@ -1,3 +1,6 @@
+#ifndef POINT_H
+#define POINT_H
+
 class Point {
     private:
         int row;
@@ -19,4 +22,5 @@ class Point {
         // Setters
         void setRow(int row);
         void setCol(int col);
-};
+    };
+    #endif

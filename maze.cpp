@@ -311,19 +311,13 @@ int Maze::contains(Point* list,int length, Point aPoint){
 }
 
 int Maze::containsAlt(Point* list, int length, int row, int col){
-    Point theCell;
-    theCell.getRow() = row;
-    theCell.getCol() = col;
-    
-    return contains(list, length, theCell);
+    return contains(list, length, Point(row, col));
 }
 
 int Maze::addNearbyWalls(Point* list, int length, Point aPoint){
     int originalLength = length;
     if(aPoint.getRow() -1  >= 0){
-        Point thisWall;
-        thisWall.getRow() = aPoint.getRow() -1;
-        thisWall.getCol() = aPoint.getCol();
+        Point thisWall = Point(aPoint.getRow() -1, aPoint.getCol());
        //If it is a wall, and is not already in the list, add it to the list 
         if(this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)){
             list[length] = thisWall;
@@ -332,9 +326,7 @@ int Maze::addNearbyWalls(Point* list, int length, Point aPoint){
     }
 
     if(aPoint.getRow() + 1 < this->rows){
-        Point thisWall;
-        thisWall.getRow() = aPoint.getRow() +1;
-        thisWall.getCol() = aPoint.getCol();
+        Point thisWall = Point(aPoint.getRow() + 1, aPoint.getCol());
 
         if(this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)){
             list[length] = thisWall;
@@ -343,9 +335,7 @@ int Maze::addNearbyWalls(Point* list, int length, Point aPoint){
     }
 
     if (aPoint.getCol() -1 >= 0) {
-        Point thisWall;
-        thisWall.getRow() = aPoint.getRow();
-        thisWall.getCol() = aPoint.getCol()-1;
+        Point thisWall = Point(aPoint.getRow(), aPoint.getCol() - 1);
 
         if(this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)){
             list[length] = thisWall;
@@ -354,9 +344,7 @@ int Maze::addNearbyWalls(Point* list, int length, Point aPoint){
     }
 
     if (aPoint.getCol() + 1 < this->columns) {
-        Point thisWall;
-        thisWall.getRow() = aPoint.getRow();
-        thisWall.getCol() = aPoint.getCol()+1;
+        Point thisWall = Point(aPoint.getRow(), aPoint.getCol() + 1);
         
         if (this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)) {
             list[length] = thisWall;
@@ -380,10 +368,7 @@ void Maze::randPrim() {
     for(int i = 0; i < this->rows; i++){
         for(int k = 0; k < this->columns; k++){
             if(this->maze[i][k] == 0){
-                Point nextPoint;
-                nextPoint.getRow() = i;
-                nextPoint.getCol() = k;
-                unvisited[unvisitedIndex] = nextPoint;
+                unvisited[unvisitedIndex] = Point(i, k);
                 unvisitedIndex++;
             }
         }
@@ -402,26 +387,22 @@ void Maze::randPrim() {
             //If the next position is valid and unvisited
             if(nextWall.getRow() -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()-1, nextWall.getCol())){
                 //set it to the next move, increment numNearUnvisited
-                nextMove.getRow() = nextWall.getRow() -1;
-                nextMove.getCol() = nextWall.getCol();
+                nextMove = Point(nextWall.getRow() - 1, nextWall.getCol());
                 numNearUnvisited++;
             }
 
             if(nextWall.getRow() +1 < this->rows && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()+1, nextWall.getCol())){
-                nextMove.getRow() = nextWall.getRow()+1;
-                nextMove.getCol() = nextWall.getCol();
+                nextMove = Point(nextWall.getRow() + 1, nextWall.getCol());
                 numNearUnvisited++;
             }
 
             if(nextWall.getCol() -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()-1)){
-                nextMove.getRow() = nextWall.getRow();
-                nextMove.getCol() = nextWall.getCol()-1;
+                nextMove = Point(nextWall.getRow(), nextWall.getCol() - 1);
                 numNearUnvisited++;
             }
 
             if(nextWall.getCol() +1 < this->columns && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()+1)){
-                nextMove.getRow() = nextWall.getRow();
-                nextMove.getCol() = nextWall.getCol()+1;
+                nextMove = Point(nextWall.getRow() -1, nextWall.getCol() + 1);
                 numNearUnvisited++;
             }
             

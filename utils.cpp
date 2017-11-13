@@ -1,4 +1,4 @@
-#include <Math.h>
+#include <math.h>
 #include "utils.h"
 
 int Utils::manhattanDistance(Point a, Point b) {

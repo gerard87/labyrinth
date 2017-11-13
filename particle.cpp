@@ -9,6 +9,14 @@ Particle::Particle(int row, int col) {
     this->state = QUIET;
 }
 
+float getX() {
+    return this->x;
+}
+
+float getY() {
+    return this->y;
+}
+
 int Particle::getState() {
     return this->state;
 }

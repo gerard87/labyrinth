@@ -24,7 +24,7 @@ class Maze {
         int** getMaze();
 
         void printMaze();
-        bool isWall(Point::Point p);
+        bool isWall(Point p);
         bool isWall(int row, int col);
 
         bool isSquared();
@@ -35,9 +35,6 @@ class Maze {
         Point getCurrentPosition(int agentIndex);
         Particle getAgent(int agentIndex);
 
-        void set_position(int agentIndex, int x, int y);
-        void init_movement(int agentIndex, int destination_x, int destination_y, int duration);
-        void integrate(int agentIndex, long t);
         int getAgentsNum();
 
         Point getPlayerBase();
@@ -61,14 +58,14 @@ class Maze {
         Point playerBase;
         Point enemyBase;
 
-        std::vector<Point::Point> walls;
+        std::vector<Point> walls;
 
         void generateMaze();
         void allocMaze();
         void randPrim();
         void removeIndex(Point* list, int length, int index);
-        void removePoint(Point* list, int length, Point::Point aPoint);
-        int contains(Point* list,int length, Point::Point aPoint);
+        void removePoint(Point* list, int length, Point aPoint);
+        int contains(Point* list,int length, Point aPoint);
         int containsAlt(Point* list, int length, int row, int col);
         int addNearbyWalls(Point* list, int length, Point aPoint);
         void createHoles();
