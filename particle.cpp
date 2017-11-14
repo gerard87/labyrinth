@@ -1,4 +1,3 @@
-#include <iostream>
 #include "particle.h"
 
 Particle::Particle() {
@@ -53,4 +52,16 @@ Point Particle::getPosition() {
 
 void Particle::setPoint(Point p) {
     this->position = p;
+}
+
+void Particle::draw(float square_width, float square_height) {
+    glBegin(GL_QUADS);
+    float x = getX();
+    float y = getY();
+
+    glVertex2i(x-square_height/2, y-square_width/2); 
+    glVertex2i(x+square_height/2, y-square_width/2); 
+    glVertex2i(x+square_height/2, y+square_width/2); 
+    glVertex2i(x-square_height/2, y+square_width/2);                    
+    glEnd();
 }

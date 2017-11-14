@@ -1,5 +1,6 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
+#include <GL/glut.h>
 
 #include "point.h"
 
@@ -34,5 +35,6 @@ class Particle {
         void setPoint(Point p);
         float getX();
         float getY();
+        void draw(float square_width, float square_height);
     };
     #endif

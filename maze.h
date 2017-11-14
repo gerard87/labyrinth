@@ -5,15 +5,13 @@
 
 #include "directions.h"
 #include "particle.h"
+#include "point.h"
 
 using namespace std;
-
-//class Directions;
 
 class Maze {
 
     public:
-        
         Maze();
         Maze(int rows, int columns);
         Maze(int squared);
@@ -33,9 +31,7 @@ class Maze {
         bool move(int agentIndex, Directions::Direction direction);
         Point getCurrentPosition(int agentIndex);
         Particle* getAgent(int agentIndex);
-
         int getAgentsNum();
-
         Point getPlayerBase();
 
         std::vector<Directions::Direction> getAvailableMoves(int agentIndex);
@@ -70,7 +66,6 @@ class Maze {
         void encloseMaze();
         void setHolesQuantity();
         void removePoint(std::vector<Point> & points, int row, int col);
-
 
         // Game Helpers
         bool agentInPosition(int agentIndex, Point pos);

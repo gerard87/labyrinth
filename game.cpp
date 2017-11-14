@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <climits>
 #include <GL/glut.h>
 
 #include "maze.h"
@@ -20,7 +21,6 @@ int col_to_x(int col, int offset);
 int row_to_y(int row, int offset);
 void timer (int extra);
 
-
 Maze maze;
 int WIDTH;
 
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
         sscanf(argv[1], "%d", &maze_rows);
         maze = Maze(maze_rows);
     } else {
-	//Read maze dimensions from command line arguments
+	    //Read maze dimensions from command line arguments
         if (sscanf(argv[1], "%d", &maze_rows ) + sscanf(argv[2], "%d", &maze_cols) < 2) {
             fprintf( stderr, "%s: invalid maze size value!\n", argv[0]);
             exit(1);
@@ -58,11 +58,12 @@ int main(int argc, char* argv[]) {
     setScreenSize();
 
     for(int i = 0; i < maze.getAgentsNum(); i++) {
-        Point pos = maze.getAgent(i)->getPosition();
+        Particle* agent = maze.getAgent(i);
+        Point pos = agent->getPosition();
 
         int colX = col_to_x(pos.getCol(), 0);
         int rowY = row_to_y(pos.getRow(), 0);
-        maze.getAgent(i)->set_position(colX, rowY);
+        agent->set_position(colX, rowY);
     }
 
     glutInit(&argc, argv);
@@ -128,25 +129,9 @@ void display() {
             glEnd();
 
             for(int i = 0; i < maze.getAgentsNum(); i++) {
-                Particle* agent = maze.getAgent(i);
-                float square_width = (WIDTH/maze.getColumns())/2;
-                float square_height = (HEIGHT/maze.getRows())/2;
-
-                if (i == 0) {
-                    glColor3f(0.8, 0.5, 0.0);
-                } else {
-                    glColor3f(0.6, 0.1, 0.6);
-                }
-
-                glBegin(GL_QUADS);
-                float x = agent->getX();
-                float y = agent->getY();
-
-                glVertex2i(x-square_height/2, y-square_width/2); 
-                glVertex2i(x+square_height/2, y-square_width/2); 
-                glVertex2i(x+square_height/2, y+square_width/2); 
-                glVertex2i(x-square_height/2, y+square_width/2);                    
-                glEnd();
+                if (i == 0) glColor3f(0.8, 0.5, 0.0);
+                else glColor3f(0.6, 0.1, 0.6);
+                maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2);
             }
         }
     glutSwapBuffers();
@@ -168,6 +153,9 @@ void specialKeys(int key, int x, int y) {
             break;
         case GLUT_KEY_DOWN:
             direction = Directions::DOWN;
+            break;
+        default:
+            direction = Directions::STOP;
             break;
     }
     if (maze.move(0, direction)) {
@@ -201,12 +189,9 @@ void moveEnemy() {
         Particle* agent = maze.getAgent(i);
         Point pos = agent->getPosition();
 
-        std::vector<Directions::Direction> moves = maze.getAvailableMoves(i);
         std::vector<Directions::Direction> minMoves;
-        int minDistance = 9999999;
-        for(int j = 0; j < moves.size(); j++){
-            Directions::Direction d = moves[j];
-
+        int minDistance = INT_MAX;
+        for(auto const &d : maze.getAvailableMoves(i)){
             Point newPos = Point(pos.getRow() + d.y, pos.getCol() + d.x);
             int manDistance = Utils::manhattanDistance(maze.getPlayerBase(), newPos);
             if (manDistance <= minDistance) {

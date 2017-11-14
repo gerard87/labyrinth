@@ -43,7 +43,7 @@ int Maze::getValue(int row, int column) {
 }
 
 bool Maze::isWall(Point p) {
-    return this->maze[p.getRow()][p.getCol()] == 1;
+    return isWall(p.getRow(),p.getCol());
 }
 
 bool Maze::isWall(int row, int col) {
@@ -71,6 +71,10 @@ bool Maze::agentInPosition(int agentIndex, Point pos) {
 
 bool Maze::checkValidMove(int agentIndex, Point to) {
     return (!isWall(to) && !agentInPosition(agentIndex, to));
+}
+
+Point Maze::getPlayerBase() {
+    return this->playerBase;
 }
 
 Point Maze::getCurrentPosition(int agentIndex) {
@@ -118,7 +122,6 @@ std::vector<Directions::Direction> Maze::getAvailableMoves(int agentIndex) {
 
     return availableMoves;
 }
-
 
 int Maze::getAgentsNum() {
     return this->agentsNum;
@@ -175,7 +178,6 @@ void Maze::createHoles() {
     std::random_device seed;
     std::mt19937 engine(seed());
     std::uniform_int_distribution<int> choose(0, this->walls.size() - 1);
-    int holes = 0;
     
     Point points[this->makeHoles];
     int generated_points = 0;
@@ -310,9 +312,9 @@ int Maze::containsAlt(Point* list, int length, int row, int col){
 
 int Maze::addNearbyWalls(Point* list, int length, Point aPoint){
     int originalLength = length;
-    if(aPoint.getRow() -1  >= 0){
-        Point thisWall = Point(aPoint.getRow() -1, aPoint.getCol());
-       //If it is a wall, and is not already in the list, add it to the list 
+    if(aPoint.getRow() -1 >= 0){
+        Point thisWall = Point(aPoint.getRow() - 1, aPoint.getCol());
+        //If it is a wall, and is not already in the list, add it to the list 
         if(this->maze[thisWall.getRow()][thisWall.getCol()] && !contains(list, length, thisWall)){
             list[length] = thisWall;
             length++;
@@ -379,23 +381,23 @@ void Maze::randPrim() {
             Point nextMove; 
 
             //If the next position is valid and unvisited
-            if(nextWall.getRow() -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()-1, nextWall.getCol())){
+            if(nextWall.getRow() - 1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()-1, nextWall.getCol())){
                 //set it to the next move, increment numNearUnvisited
                 nextMove = Point(nextWall.getRow() - 1, nextWall.getCol());
                 numNearUnvisited++;
             }
 
-            if(nextWall.getRow() +1 < this->rows && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()+1, nextWall.getCol())){
+            if(nextWall.getRow() + 1 < this->rows && containsAlt(unvisited, unvisitedIndex, nextWall.getRow()+1, nextWall.getCol())){
                 nextMove = Point(nextWall.getRow() + 1, nextWall.getCol());
                 numNearUnvisited++;
             }
 
-            if(nextWall.getCol() -1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()-1)){
+            if(nextWall.getCol() - 1 >= 0 && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()-1)){
                 nextMove = Point(nextWall.getRow(), nextWall.getCol() - 1);
                 numNearUnvisited++;
             }
 
-            if(nextWall.getCol() +1 < this->columns && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()+1)){
+            if(nextWall.getCol() + 1 < this->columns && containsAlt(unvisited, unvisitedIndex, nextWall.getRow(), nextWall.getCol()+1)){
                 nextMove = Point(nextWall.getRow(), nextWall.getCol() + 1);
                 numNearUnvisited++;
             }
@@ -422,11 +424,3 @@ void Maze::randPrim() {
     }
 
 }
-
-Point Maze::getPlayerBase() {
-    return this->playerBase;
-}
-
-// int Maze::manhattanDistance(Maze::Point a, Maze::Point b) {
-//     return abs(a.getCol() - b.getCol()) + abs(a.getRow() - b.getRow());
-// }
