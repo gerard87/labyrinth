@@ -26,6 +26,20 @@ int WIDTH;
 
 long last_t = 0;
 
+void drawStrokeText(char*string,int x,int y,int z)
+{
+	  char *c;
+	  glPushMatrix();
+	  glTranslatef(x, y+8,z);
+	  glScalef(0.15f, 0.15f,z);
+  
+	  for (c=string; *c != '\0'; c++)
+	  {
+    		glutStrokeCharacter(GLUT_STROKE_ROMAN , *c);
+	  }
+	  glPopMatrix();
+}
+
 int main(int argc, char* argv[]) {
 
     int maze_cols, maze_rows;
@@ -134,6 +148,9 @@ void display() {
                 maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2);
             }
         }
+
+        glColor3f(0,0,0);
+	    drawStrokeText("Time left to play: 43s", 25, HEIGHT - 50,0);
     glutSwapBuffers();
 }
 
