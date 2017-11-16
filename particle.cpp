@@ -59,9 +59,9 @@ void Particle::draw(float square_width, float square_height) {
     float x = getX();
     float y = getY();
 
-    glVertex2i(x-square_height/2, y-square_width/2); 
-    glVertex2i(x+square_height/2, y-square_width/2); 
-    glVertex2i(x+square_height/2, y+square_width/2); 
-    glVertex2i(x-square_height/2, y+square_width/2);                    
+    glVertex3i(x-square_height/2, 50, y-square_width/2); 
+    glVertex3i(x+square_height/2, 50, y-square_width/2); 
+    glVertex3i(x+square_height/2, 50, y+square_width/2); 
+    glVertex3i(x-square_height/2, 50, y+square_width/2);                    
     glEnd();
 }

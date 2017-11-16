@@ -3,12 +3,15 @@
 #include <cstdlib>
 #include <climits>
 #include <GL/glut.h>
+#include <math.h>
 
 #include "maze.h"
 #include "directions.h"
 #include "utils.h"
 
-#define HEIGHT 600
+#define HEIGHT 1000
+
+#define PI 3.1416
 
 using namespace std;
 
@@ -20,11 +23,17 @@ void idle();
 int col_to_x(int col, int offset);
 int row_to_y(int row, int offset);
 void timer (int extra);
+void PositionObserver(float alpha,float beta,int radi);
+void keyboard(unsigned char c,int x,int y);
+void print(int row, int col);
 
 Maze maze;
 int WIDTH;
 
 long last_t = 0;
+
+int anglealpha = 0;
+int anglebeta = 0;
 
 int main(int argc, char* argv[]) {
 
@@ -67,19 +76,20 @@ int main(int argc, char* argv[]) {
     }
 
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowPosition(50, 50);
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Labyrinth Race");
+    glEnable(GL_DEPTH_TEST);
     
     glutDisplayFunc(display);
-    //glutKeyboardFunc(keyboard);
+    glutKeyboardFunc(keyboard);
     glutSpecialFunc(specialKeys);
     glutIdleFunc(idle);
     glutTimerFunc(0, timer, 0);
     
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(0,WIDTH-1,0,HEIGHT-1);
+    //glMatrixMode(GL_PROJECTION);
+    //gluOrtho2D(0,WIDTH-1,0,HEIGHT-1);
     
     glutMainLoop();
 
@@ -96,9 +106,65 @@ void setScreenSize() {
     }
 }
 
+void PositionObserver(float alpha,float beta,int radi)
+{
+  float x,y,z;
+  float upx,upy,upz;
+  float modul;
+
+  x = (float)radi*cos(alpha*2*PI/360.0)*cos(beta*2*PI/360.0);
+  y = (float)radi*sin(beta*2*PI/360.0);
+  z = (float)radi*sin(alpha*2*PI/360.0)*cos(beta*2*PI/360.0);
+
+  if (beta>0)
+    {
+      upx=-x;
+      upz=-z;
+      upy=(x*x+z*z)/y;
+    }
+  else if(beta==0)
+    {
+      upx=0;
+      upy=1;
+      upz=0;
+    }
+  else
+    {
+      upx=x;
+      upz=z;
+      upy=-(x*x+z*z)/y;
+    }
+
+
+  modul=sqrt(upx*upx+upy*upy+upz*upz);
+
+  upx=upx/modul;
+  upy=upy/modul;
+  upz=upz/modul;
+
+  gluLookAt(x,y,z,    0.0, 0.0, 0.0,     upx,upy,upz);
+}
+
 void display() {
     glClearColor(0.0,0.0,0.0,0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+  
+    PositionObserver(anglealpha,anglebeta,450);
+  
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-WIDTH*0.6,WIDTH*0.6,-HEIGHT*0.6,HEIGHT*0.6,10,2000);
+  
+    glMatrixMode(GL_MODELVIEW);
+  
+    glPolygonMode(GL_FRONT,GL_FILL);
+    glPolygonMode(GL_BACK,GL_LINE);
+
+
 
     for(int row = 0; row < maze.getRows(); row++)
         for(int col = 0; col < maze.getColumns(); col++) {
@@ -110,6 +176,7 @@ void display() {
                     break;        
                 case 1:
                     glColor3f(0.0 ,0.0, 0.8);
+                    print(row, col);
                     break;
                 case 2: 
                     glColor3f(0.0 ,0.8, 0.0);
@@ -119,15 +186,7 @@ void display() {
                     break;            
             } 
       
-            glBegin(GL_QUADS);
             
-            glVertex2i(col*WIDTH/maze.getColumns(), HEIGHT - row*HEIGHT/maze.getRows()); 
-            glVertex2i(col*WIDTH/maze.getColumns(), HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
-            glVertex2i((col+1)*WIDTH/maze.getColumns(), HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
-            glVertex2i((col+1)*WIDTH/maze.getColumns(), HEIGHT - row*HEIGHT/maze.getRows());
-            
-            glEnd();
-
             for(int i = 0; i < maze.getAgentsNum(); i++) {
                 if (i == 0) glColor3f(0.8, 0.5, 0.0);
                 else glColor3f(0.6, 0.1, 0.6);
@@ -135,6 +194,40 @@ void display() {
             }
         }
     glutSwapBuffers();
+}
+
+void print(int row, int col) {
+    int z = ((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()); 
+    glBegin(GL_QUADS);
+    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows()); 
+    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
+    glVertex3i((col+1)*WIDTH/maze.getColumns(),z, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
+    glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows()); 
+    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
+    glVertex3i((col+1)*WIDTH/maze.getColumns(),0, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
+    glVertex3i((col+1)*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows());
+    glEnd();
+
+    glColor3f(0.8 ,0.0, 0.0);
+
+    glBegin(GL_QUADS);
+    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows()); 
+    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows()); 
+    glVertex3i((col+1)*WIDTH/maze.getColumns(),0, HEIGHT - row*HEIGHT/maze.getRows()); 
+    glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
+    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
+    glVertex3i(col*WIDTH/maze.getColumns(),0, HEIGHT - row*HEIGHT/maze.getRows()); 
+    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
+    glEnd();
+
 }
 
 void specialKeys(int key, int x, int y) {
@@ -161,6 +254,22 @@ void specialKeys(int key, int x, int y) {
     if (maze.move(0, direction)) {
         agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
     }
+}
+
+void keyboard(unsigned char c,int x,int y)
+{
+  int i,j;
+
+  if (c=='i' && anglebeta<=(90-4))
+    anglebeta=(anglebeta+3);
+  else if (c=='k' && anglebeta>=(-90+4))
+    anglebeta=anglebeta-3;
+  else if (c=='j')
+    anglealpha=(anglealpha+3)%360;
+  else if (c=='l')
+    anglealpha=(anglealpha-3+360)%360;
+
+  glutPostRedisplay();
 }
 
 void idle() {
