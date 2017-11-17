@@ -34,7 +34,7 @@ int WIDTH;
 long last_t = 0;
 
 int anglealpha = 0;
-int anglebeta = 0;
+int anglebeta = 30;
 
 int main(int argc, char* argv[]) {
 
@@ -154,7 +154,7 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
   
-    PositionObserver(anglealpha,anglebeta,450);
+    PositionObserver(anglealpha,anglebeta,950);
   
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -163,8 +163,8 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
   
     glPolygonMode(GL_FRONT,GL_FILL);
-    glPolygonMode(GL_BACK,GL_LINE);
-
+    //glPolygonMode(GL_BACK,GL_LINE);
+    glPolygonMode(GL_BACK,GL_FILL);
 
 
     for(int row = 0; row < maze.getRows(); row++)
@@ -177,7 +177,7 @@ void display() {
                     printSquare(row,col);
                     break;        
                 case 1:
-                    glColor3f(0.0 ,0.0, 0.8);
+                    glColor3f(0.0 ,0.0, 1);
                     printCube(row, col);
                     break;
                 case 2: 
@@ -211,7 +211,7 @@ void printSquare(int row, int col) {
 }
 
 void printCube(int row, int col) {
-    int z = ((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()); 
+    int z = (((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()))/2; 
     glBegin(GL_QUADS);
     glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
     glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
