@@ -194,7 +194,7 @@ void display() {
             for(int i = 0; i < maze.getAgentsNum(); i++) {
                 if (i == 0) glColor3f(0.8, 0.5, 0.0);
                 else glColor3f(0.6, 0.1, 0.6);
-                maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2);
+                maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
             }
         }
     glutSwapBuffers();
@@ -203,59 +203,59 @@ void display() {
 void printSquare(int row, int col) {
 
     glBegin(GL_QUADS);
-    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(),0, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
-    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - (row+1)*HEIGHT/maze.getRows()); 
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2)); 
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2)); 
     glEnd();
 }
 
 void printCube(int row, int col) {
     int z = (((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()))/2; 
     glBegin(GL_QUADS);
-    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(),z, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - (row+1)*HEIGHT/maze.getRows());
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),z, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(),0, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows());
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
 
     glColor3f(0.0 ,0.5, 0.8);
 
     glBegin(GL_QUADS);
-    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(),0, HEIGHT - row*HEIGHT/maze.getRows()); 
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2)); 
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i(col*WIDTH/maze.getColumns(),0, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2),0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
 
     glBegin(GL_QUADS);
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(),0, HEIGHT - row*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), 0, HEIGHT - (row+1)*HEIGHT/maze.getRows());
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),0, (HEIGHT - row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i(col*WIDTH/maze.getColumns(), z, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(), z, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i((col+1)*WIDTH/maze.getColumns(),0, HEIGHT - (row+1)*HEIGHT/maze.getRows());
-    glVertex3i(col*WIDTH/maze.getColumns(), 0, HEIGHT - (row+1)*HEIGHT/maze.getRows());
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (HEIGHT - (row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
 }

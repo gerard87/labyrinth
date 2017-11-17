@@ -35,6 +35,6 @@ class Particle {
         void setPoint(Point p);
         float getX();
         float getY();
-        void draw(float square_width, float square_height);
+        void draw(float square_width, float square_height, int width, int height);
     };
     #endif
