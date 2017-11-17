@@ -4,3 +4,5 @@ clean:
 	rm game
 exec:
 	./game 25 51
+debug:
+	./game 25 51 -d

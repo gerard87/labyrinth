@@ -21,6 +21,13 @@ Maze::Maze(int squared) {
     this->generateMaze();
 }
 
+Maze::Maze(int debug, int rows, int columns) {
+    this->debug = debug;
+    this->rows = rows;
+    this->columns = columns;
+    this->generateMaze();
+}
+
 // Getters
 int Maze::getRows() {
     return this->rows;
@@ -137,6 +144,8 @@ bool Maze::move(int agentIndex, Directions::Direction direction) {
     Point newPos = Point(row + direction.y, col + direction.x);
     if (checkValidMove(agentIndex, newPos) && agent->getState() == Particle::QUIET) {
         agent->setPoint(Point(row + direction.y, col + direction.x));
+        if (debug) if (agentIndex == 0) printMaze();
+            
         return true;
     } else return false;
 }
@@ -152,6 +161,8 @@ void Maze::generateMaze(){
     generateStartingPoints(); 
     setHolesQuantity();
     createHoles(); 
+    if (debug) printMaze();
+
 }
 
 void Maze::setHolesQuantity() {

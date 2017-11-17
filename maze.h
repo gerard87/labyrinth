@@ -15,6 +15,7 @@ class Maze {
         Maze();
         Maze(int rows, int columns);
         Maze(int squared);
+        Maze(int debug, int rows, int columns);
         
         int getRows();
         int getColumns();
@@ -36,7 +37,7 @@ class Maze {
 
         std::vector<Directions::Direction> getAvailableMoves(int agentIndex);
     private:
-
+        int debug = 0;
         int rows;
         int columns;
         int** maze;

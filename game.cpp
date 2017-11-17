@@ -4,6 +4,7 @@
 #include <climits>
 #include <GL/glut.h>
 #include <math.h>
+#include <string.h>
 
 #include "maze.h"
 #include "directions.h"
@@ -41,10 +42,14 @@ int main(int argc, char* argv[]) {
     int maze_cols, maze_rows;
     if (argc == 1) {
 		maze = Maze(25);
-	} else if (argc == 2) {
+	} else if (argc == 2) {        
         sscanf(argv[1], "%d", &maze_rows);
         maze = Maze(maze_rows);
     } else {
+        int debug = 0;
+        if (argc == 3 && strcmp(argv[2],"-d") == 0 || argc == 4 && strcmp(argv[3],"-d") == 0) {
+            debug = 1;
+        }  
 	    //Read maze dimensions from command line arguments
         if (sscanf(argv[1], "%d", &maze_rows ) + sscanf(argv[2], "%d", &maze_cols) < 2) {
             fprintf( stderr, "%s: invalid maze size value!\n", argv[0]);
@@ -60,7 +65,11 @@ int main(int argc, char* argv[]) {
             fprintf(stderr, "%s: dimensions must be greater than 0!\n", argv[0]);
             exit(1);
         }
-        maze = Maze(maze_rows, maze_cols);
+        if (debug) {
+            maze = Maze(debug, maze_rows, maze_cols);
+        } else {
+            maze = Maze(maze_rows, maze_cols);
+        }
     }
 
     srand(time(NULL));
