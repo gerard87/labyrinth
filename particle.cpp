@@ -60,45 +60,45 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     int z = (x+square_height/2) - (x-square_height/2); 
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(height/2), z, (y-square_width/2)-(width/2));
-    glVertex3i((x-square_height/2)-(height/2), z, (y+square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), z, (y+square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), z, (y-square_width/2)-(width/2));
+    glVertex3i((x-square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
+    glVertex3i((x-square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(height/2), 0, (y-square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), 0, (y-square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), 0, (y+square_width/2)-(width/2));
-    glVertex3i((x-square_height/2)-(height/2), 0, (y+square_width/2)-(width/2));
+    glVertex3i((x-square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
+    glVertex3i((x-square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(height/2), z, (y-square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), z, (y-square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), 0, (y-square_width/2)-(width/2));
-    glVertex3i((x-square_height/2)-(height/2), 0, (y-square_width/2)-(width/2));
+    glVertex3i((x-square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
+    glVertex3i((x-square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(height/2), z, (y+square_width/2)-(width/2));
-    glVertex3i((x-square_height/2)-(height/2), z, (y-square_width/2)-(width/2));
-    glVertex3i((x-square_height/2)-(height/2), 0, (y-square_width/2)-(width/2));
-    glVertex3i((x-square_height/2)-(height/2), 0, (y+square_width/2)-(width/2));
+    glVertex3i((x-square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
+    glVertex3i((x-square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
+    glVertex3i((x-square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
+    glVertex3i((x-square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x+square_height/2)-(height/2), z, (y+square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), 0, (y+square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), 0, (y-square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), z, (y-square_width/2)-(width/2));
+    glVertex3i((x+square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(height/2), z, (y+square_width/2)-(width/2));
-    glVertex3i((x-square_height/2)-(height/2), 0, (y+square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), 0, (y+square_width/2)-(width/2));
-    glVertex3i((x+square_height/2)-(height/2), z, (y+square_width/2)-(width/2));
+    glVertex3i((x-square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
+    glVertex3i((x-square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
+    glVertex3i((x+square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
     glEnd();
 
 }
