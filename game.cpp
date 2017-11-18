@@ -159,7 +159,6 @@ void display() {
     glClearColor(0.0,0.0,0.0,0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
   
@@ -175,6 +174,13 @@ void display() {
     //glPolygonMode(GL_BACK,GL_LINE);
     glPolygonMode(GL_BACK,GL_FILL);
 
+    glColor3f(0.7, 0.8, 0.7);
+    glBegin(GL_QUADS);
+    glVertex3i(-1 * (3 * WIDTH), -1, -1 * 3 * HEIGHT);
+    glVertex3i(-1 * (3 * WIDTH), -1, 3 * HEIGHT);
+    glVertex3i(3 * WIDTH, -1, 3 * HEIGHT); 
+    glVertex3i(3 * WIDTH, -1, -1 * 3 * HEIGHT); 
+    glEnd();
 
     for(int row = 0; row < maze.getRows(); row++)
         for(int col = 0; col < maze.getColumns(); col++) {
@@ -210,17 +216,17 @@ void display() {
 }
 
 void printSquare(int row, int col) {
-
+    int w = WIDTH;
+    int h = HEIGHT;
     glBegin(GL_QUADS);
-    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), 0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2)); 
-    glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2)); 
+    glVertex3i((col*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
+    glVertex3i(((col+1)*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
+    glVertex3i(((col+1)*w/maze.getColumns())-(w/2),0, ((row+1)*h/maze.getRows())-(h/2)); 
+    glVertex3i((col*w/maze.getColumns())-(w/2), 0, ((row+1)*h/maze.getRows())-(h/2)); 
     glEnd();
 }
 
-void printCube(int row, int col) {
-
+void printCube(int row, int col) {   
     int squareL = WIDTH/maze.getColumns();
     int z = (((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()))/2; 
     glBegin(GL_QUADS);
@@ -359,9 +365,9 @@ void moveEnemy() {
 }
 
 int col_to_x(int col, int offset) {
-    return (int)(((col+offset)*WIDTH/maze.getColumns()) + ((col+1+offset)*WIDTH/maze.getColumns()))/2;
+    return (int)(((col+offset)*(WIDTH)/maze.getColumns()) + ((col+1+offset)*(WIDTH)/maze.getColumns()))/2;
 }
 
 int row_to_y(int row, int offset) {
-    return (int)((row+offset)*HEIGHT/maze.getRows()) + ((row+1+offset)*HEIGHT/maze.getRows())/2;
+    return (int)((row+offset)*(HEIGHT)/maze.getRows()) + ((row+1+offset)*(HEIGHT)/maze.getRows())/2 - (row+offset)*(HEIGHT)/maze.getRows()/2;
 }
