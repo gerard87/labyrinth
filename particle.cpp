@@ -68,8 +68,13 @@ void drawGluSlantCylinder( double height, double radiusBase, double radiusTop, i
 		gluQuadricNormals(myReusableQuadric, GL_TRUE);
 	}
 
+    //glPolygonMode(GL_FRONT,GL_LINE);
     glPolygonMode(GL_BACK,GL_LINE);
-	gluCylinder(myReusableQuadric, radiusBase, radiusTop, height, slices, stacks);
+    gluCylinder(myReusableQuadric, radiusBase, radiusTop, height, slices, stacks);
+    
+    gluDisk(myReusableQuadric, 0.0, radiusBase, slices, stacks);
+    glTranslatef(0, 0, height);
+    gluDisk(myReusableQuadric, 0.0, radiusBase, slices, stacks);
 }
 
 
@@ -125,16 +130,19 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     glEnd();*/
 
     glPushMatrix();
-    glTranslatef( (x-square_height/2)-(width/2), 0.0, (y-square_width/2)-(height/2) );
+    glTranslatef( (x-square_height/2)-(width/2), 5.0, (y-square_width/2)-(height/2) );
     //glRotatef( RotateAngle, 0.0, 1.0, 0.0 );		// Rotate around y-axis
     //glRotatef( Azimuth, 1.0, 0.0, 0.0 );			// Set Azimuth angle
 
-    //glDisable( GL_CULL_FACE );
+    glDisable( GL_CULL_FACE );
     glPushMatrix();
     glTranslatef( 1.5, 0.0, 0.0 );
-    glRotatef( -90.0, 1.0, 0.0, 0.0 );
+    glRotatef( -180.0, 1.0, 0.0, 1.0 );
     // Parameters: height, radius, slices, stacks
-    drawGluCylinder(100, 20, 8, 10 );
+    drawGluCylinder(square_height, 5.0, 90, 1 );
+    glTranslatef(square_height, 0, -square_width);
+    drawGluCylinder(square_height, 5.0, 90, 1 );
+
     glPopMatrix();
     
     
