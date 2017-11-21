@@ -1,16 +1,19 @@
 #include "particle.h"
+#include "directions.h"
 
 GLUquadric* myReusableQuadric = 0;
-float Azimuth = 20.0;	
-float RotateAngle = 0.0f;
 
 Particle::Particle() {
     this->state = QUIET;
+    this->orientation = Directions::DOWN;
+    this->angle = 0;
 }
 
 Particle::Particle(int row, int col) {
     this->position = Point(row, col);
     this->state = QUIET;
+    this->orientation = Directions::DOWN;
+    this->angle = 0;
 }
 
 float Particle::getX() {
@@ -23,6 +26,23 @@ float Particle::getY() {
 
 int Particle::getState() {
     return this->state;
+}
+
+void Particle::setOrientation(Directions::Direction direction) {
+    this->orientation = direction;
+}
+
+Directions::Direction Particle::getOrientation() {
+    return this->orientation;
+}
+
+void Particle::setAngle(float angle) {
+    this->angle = angle;
+}
+
+
+float Particle::getAngle() {
+    return this->angle;
 }
 
 void Particle::init_movement(int destination_x, int destination_y, int duration) {
@@ -43,6 +63,10 @@ void Particle::integrate(long t) {
         this->y += this->vy*this->time_remaining;
         this->state=QUIET;
     }
+}
+
+void Particle::init_rotate(Directions::Direction direction, float angle, int duration) {
+
 }
 
 void Particle::set_position(int x, int y) {
@@ -91,7 +115,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     int ay = (y-square_width/2)-(height/2);
     int by = (y+square_width/2)-(height/2);
     int border_size = 3;
-    
+
     /* Tank base */
 
     glBegin(GL_QUADS);
@@ -189,13 +213,21 @@ void Particle::draw(float square_width, float square_height, int width, int heig
 
     glPushMatrix();
     glTranslatef((x-square_height/2)-(width/2), radius, (y-square_width/2)-(height/2));
-    //glRotatef( RotateAngle, 0.0, 1.0, 0.0 );		// Rotate around y-axis
-    //glRotatef( Azimuth, 1.0, 0.0, 0.0 );			// Set Azimuth angle
+
+    glRotatef( this->angle, 0.0, 1.0, 0.0 );
+
+    float x_offset=0, z_offset=0;
+    if(this->orientation == Directions::UP) x_offset = z_offset = -square_width;
+    else if (this->orientation == Directions::LEFT) z_offset = -square_width;
+    else if (this->orientation == Directions::RIGHT) x_offset = -square_width;
+    glTranslatef(x_offset, 0, z_offset);
+
+
     glDisable( GL_CULL_FACE );
     glPushMatrix();
     glTranslatef( 1.5, 0.0, 0.0 );
     glRotatef( -180.0, 1.0, 0.0, 1.0 );
-
+    
 
     /* Wheels */
     

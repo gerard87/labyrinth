@@ -3,6 +3,7 @@
 #include <GL/glut.h>
 
 #include "point.h"
+#include "directions.h"
 
 class Particle {
 
@@ -19,6 +20,9 @@ class Particle {
         float vx, vy;
         int state;
         long time_remaining;
+
+        Directions::Direction orientation;
+        float angle;
         
     public:
         static const int QUIET = 1;
@@ -36,5 +40,10 @@ class Particle {
         float getX();
         float getY();
         void draw(float square_width, float square_height, int width, int height);
+        void setOrientation(Directions::Direction direction);
+        Directions::Direction getOrientation();
+        void setAngle(float angle);
+        float getAngle();
+        void init_rotate(Directions::Direction direction, float angle, int duration);
     };
     #endif
