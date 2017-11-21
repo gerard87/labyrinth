@@ -23,7 +23,8 @@ void specialKeys(int key, int x, int y);
 void idle();
 int col_to_x(int col, int offset);
 int row_to_y(int row, int offset);
-void timer (int extra);
+void timer(int extra);
+void timer2(int extra);
 void PositionObserver(float alpha,float beta,int radi);
 void keyboard(unsigned char c,int x,int y);
 void printCube(int row, int col);
@@ -35,8 +36,34 @@ int WIDTH;
 
 long last_t = 0;
 
+float timeleft = 140;
+
 int anglealpha = 75;
 int anglebeta = 35;
+
+void drawStrokeText(std::string text,int x,int y,int z) {
+    glDisable(GL_TEXTURE_2D); //added this
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, WIDTH - 1, 0.0, HEIGHT - 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glRasterPos2i(50, HEIGHT - 50);
+    void * font = GLUT_BITMAP_HELVETICA_18;
+    for (string::iterator i = text.begin(); i != text.end(); ++i) {
+        char c = *i;
+        glColor3d(1.0, 0.0, 0.0);
+        glutBitmapCharacter(font, c);
+    }
+    glMatrixMode(GL_PROJECTION); //swapped this with...
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW); //...this
+    glPopMatrix();
+    //added this
+    glEnable(GL_TEXTURE_2D);
+}
 
 int main(int argc, char* argv[]) {
 
@@ -98,6 +125,8 @@ int main(int argc, char* argv[]) {
     glutSpecialFunc(specialKeys);
     glutIdleFunc(idle);
     glutTimerFunc(0, timer, 0);
+    glutTimerFunc(1000, timer2, 0);
+    
     
     glutMainLoop();
 
@@ -190,15 +219,15 @@ void display() {
                     printSquare(row,col);
                     break;        
                 case 1:
-                    glColor3f(0.0 ,0.0, 1);
+                    glColor3f(0.0, 0.0, 1.0);
                     printCube(row, col);
                     break;
                 case 2: 
-                    glColor3f(0.0 ,0.8, 0.0);
+                    glColor3f(0.0, 0.8, 0.0);
                     printSquare(row, col);
                     break;
                 case 3: 
-                    glColor3f(0.8 ,0.0, 0.1);
+                    glColor3f(0.8, 0.0, 0.1);
                     printSquare(row, col);
                     break;            
             } 
@@ -211,6 +240,8 @@ void display() {
         else glColor3f(0.6, 0.1, 0.6);
         maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
     }
+
+    drawStrokeText("Time left to play: " + std::to_string((int)(timeleft)) +"s", 25, HEIGHT - 50, 0);
 
     glutSwapBuffers();
 }
@@ -306,8 +337,7 @@ void specialKeys(int key, int x, int y) {
     agent->setAngle(angle);
 }
 
-void keyboard(unsigned char c,int x,int y)
-{
+void keyboard(unsigned char c,int x,int y) {
   int i,j;
 
   if (c=='i' && anglebeta<=(90-4))
@@ -339,6 +369,12 @@ void idle() {
 void timer (int extra) {
     moveEnemy();
     glutTimerFunc(100, timer, 0);
+}
+
+void timer2(int extra) {
+    timeleft -= 1.0;
+    glutPostRedisplay();
+    glutTimerFunc(1000, timer2, 0);
 }
 
 void moveEnemy() {
