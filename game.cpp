@@ -23,7 +23,8 @@ void specialKeys(int key, int x, int y);
 void idle();
 int col_to_x(int col, int offset);
 int row_to_y(int row, int offset);
-void timer (int extra);
+void timer(int extra);
+void timer2(int extra);
 void PositionObserver(float alpha,float beta,int radi);
 void keyboard(unsigned char c,int x,int y);
 void printCube(int row, int col);
@@ -34,22 +35,33 @@ int WIDTH;
 
 long last_t = 0;
 
+float timeleft = 140;
+
 int anglealpha = 75;
 int anglebeta = 35;
 
-void drawStrokeText(char*string,int x,int y,int z) {
-    
+void drawStrokeText(std::string text,int x,int y,int z) {
+    glDisable(GL_TEXTURE_2D); //added this
+    glMatrixMode(GL_PROJECTION);
     glPushMatrix();
-    glTranslatef(x, y+8,z);
-    glScalef(0.15f, 0.15f,z);
-
-    glColor3f(0.0, 0.0, 1.0);
-
-    for (char *c=string; *c != '\0'; c++) {
-        glutStrokeCharacter(GLUT_STROKE_ROMAN , *c);
+    glLoadIdentity();
+    gluOrtho2D(0.0, WIDTH - 1, 0.0, HEIGHT - 1);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glRasterPos2i(50, HEIGHT - 50);
+    void * font = GLUT_BITMAP_HELVETICA_18;
+    for (string::iterator i = text.begin(); i != text.end(); ++i) {
+        char c = *i;
+        glColor3d(1.0, 0.0, 0.0);
+        glutBitmapCharacter(font, c);
     }
-    
+    glMatrixMode(GL_PROJECTION); //swapped this with...
     glPopMatrix();
+    glMatrixMode(GL_MODELVIEW); //...this
+    glPopMatrix();
+    //added this
+    glEnable(GL_TEXTURE_2D);
 }
 
 int main(int argc, char* argv[]) {
@@ -112,6 +124,8 @@ int main(int argc, char* argv[]) {
     glutSpecialFunc(specialKeys);
     glutIdleFunc(idle);
     glutTimerFunc(0, timer, 0);
+    glutTimerFunc(1000, timer2, 0);
+    
     
     //glMatrixMode(GL_PROJECTION);
     //gluOrtho2D(0,WIDTH-1,0,HEIGHT-1);
@@ -229,7 +243,7 @@ void display() {
         maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
     }
 
-    drawStrokeText("Time left to play: 25s", 25, HEIGHT - 50, 0);
+    drawStrokeText("Time left to play: " + std::to_string((int)(timeleft)) +"s", 25, HEIGHT - 50, 0);
 
     glutSwapBuffers();
 }
@@ -321,8 +335,7 @@ void specialKeys(int key, int x, int y) {
     }
 }
 
-void keyboard(unsigned char c,int x,int y)
-{
+void keyboard(unsigned char c,int x,int y) {
   int i,j;
 
   if (c=='i' && anglebeta<=(90-4))
@@ -354,6 +367,12 @@ void idle() {
 void timer (int extra) {
     moveEnemy();
     glutTimerFunc(100, timer, 0);
+}
+
+void timer2(int extra) {
+    timeleft -= 1.0;
+    glutPostRedisplay();
+    glutTimerFunc(1000, timer2, 0);
 }
 
 void moveEnemy() {
