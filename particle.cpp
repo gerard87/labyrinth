@@ -3,9 +3,6 @@
 GLUquadric* myReusableQuadric = 0;
 float Azimuth = 20.0;	
 float RotateAngle = 0.0f;
-float AngleStepSize = 3.0f;		// Step three degrees at a time
-const float AngleStepMax = 10.0f;
-const float AngleStepMin = 0.1f;
 
 Particle::Particle() {
     this->state = QUIET;
@@ -68,10 +65,10 @@ void drawGluSlantCylinder( double height, double radiusBase, double radiusTop, i
 		gluQuadricNormals(myReusableQuadric, GL_TRUE);
 	}
 
-    //glPolygonMode(GL_FRONT,GL_LINE);
-    glPolygonMode(GL_BACK,GL_LINE);
+    glColor3f(0, 0, 0);
     gluCylinder(myReusableQuadric, radiusBase, radiusTop, height, slices, stacks);
     
+    glColor3f(0.3, 0.3, 0.3);
     gluDisk(myReusableQuadric, 0.0, radiusBase, slices, stacks);
     glTranslatef(0, 0, height);
     gluDisk(myReusableQuadric, 0.0, radiusBase, slices, stacks);
@@ -85,66 +82,135 @@ void drawGluCylinder( double height, double radius, int slices, int stacks ) {
 void Particle::draw(float square_width, float square_height, int width, int height) {
     float x = getX();
     float y = getY();
-    int z = (x+square_height/2) - (x-square_height/2); 
+    float radius = 5.0;
+    float diameter = radius * 2;
+    int z = ((x+square_height/2) - (x-square_height/2));
+    int cannon_base_height = 10;
+    int ax = (x-square_height/2)-(width/2);
+    int bx = (x+square_height/2)-(width/2);
+    int ay = (y-square_width/2)-(height/2);
+    int by = (y+square_width/2)-(height/2);
+    int border_size = 3;
+    
+    /* Tank base */
 
-    /*glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
-    glVertex3i((x-square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
+    glBegin(GL_QUADS);
+    glVertex3i(ax, z, ay);
+    glVertex3i(ax, z, by);
+    glVertex3i(bx, z, by);
+    glVertex3i(bx, z, ay);
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
-    glVertex3i((x-square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
+    glVertex3i(ax, diameter, ay);
+    glVertex3i(bx, diameter, ay);
+    glVertex3i(bx, diameter, by);
+    glVertex3i(ax, diameter, by);
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
-    glVertex3i((x-square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
+    glVertex3i(ax, z, ay);
+    glVertex3i(bx, z, ay);
+    glVertex3i(bx, diameter, ay);
+    glVertex3i(ax, diameter, ay);
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
-    glVertex3i((x-square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
-    glVertex3i((x-square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
-    glVertex3i((x-square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
+    glVertex3i(ax, z, by);
+    glVertex3i(ax, z, ay);
+    glVertex3i(ax, diameter, ay);
+    glVertex3i(ax, diameter, by);
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x+square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), 0, (y-square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), z, (y-square_width/2)-(height/2));
+    glVertex3i(bx, z, by);
+    glVertex3i(bx, diameter, by);
+    glVertex3i(bx, diameter, ay);
+    glVertex3i(bx, z, ay);
     glEnd();
 
     glBegin(GL_QUADS);
-    glVertex3i((x-square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
-    glVertex3i((x-square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), 0, (y+square_width/2)-(height/2));
-    glVertex3i((x+square_height/2)-(width/2), z, (y+square_width/2)-(height/2));
-    glEnd();*/
+    glVertex3i(ax, z, by);
+    glVertex3i(ax, diameter, by);
+    glVertex3i(bx, diameter, by);
+    glVertex3i(bx, z, by);
+    glEnd();
+
+
+    /* Cannon base */
+
+    glColor3f(0.3, 0.3, 0.3);
+
+    glBegin(GL_QUADS);
+    glVertex3i(ax + border_size, z+cannon_base_height, ay + border_size);
+    glVertex3i(ax + border_size, z+cannon_base_height, by - border_size);
+    glVertex3i(bx - border_size, z+cannon_base_height, by - border_size);
+    glVertex3i(bx - border_size, z+cannon_base_height, ay + border_size);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex3i(ax + border_size, z, ay + border_size);
+    glVertex3i(bx - border_size, z, ay + border_size);
+    glVertex3i(bx - border_size, z, by - border_size);
+    glVertex3i(ax + border_size, z, by - border_size);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex3i(ax + border_size, z+cannon_base_height, ay + border_size);
+    glVertex3i(bx - border_size, z+cannon_base_height, ay + border_size);
+    glVertex3i(bx - border_size, z, ay + border_size);
+    glVertex3i(ax + border_size, z, ay + border_size);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex3i(ax + border_size, z+cannon_base_height, by - border_size);
+    glVertex3i(ax + border_size, z+cannon_base_height, ay + border_size);
+    glVertex3i(ax + border_size, z, ay + border_size);
+    glVertex3i(ax + border_size, z, by - border_size);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex3i(bx - border_size, z+cannon_base_height, by - border_size);
+    glVertex3i(bx - border_size, z, by - border_size);
+    glVertex3i(bx - border_size, z, ay + border_size);
+    glVertex3i(bx - border_size, z+cannon_base_height, ay + border_size);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex3i(ax + border_size, z+cannon_base_height, by - border_size);
+    glVertex3i(ax + border_size, z, by - border_size);
+    glVertex3i(bx - border_size, z, by - border_size);
+    glVertex3i(bx - border_size, z+cannon_base_height, by - border_size);
+    glEnd();
+
+
+
+    // ----------------------
 
     glPushMatrix();
-    glTranslatef( (x-square_height/2)-(width/2), 5.0, (y-square_width/2)-(height/2) );
+    glTranslatef((x-square_height/2)-(width/2), radius, (y-square_width/2)-(height/2));
     //glRotatef( RotateAngle, 0.0, 1.0, 0.0 );		// Rotate around y-axis
     //glRotatef( Azimuth, 1.0, 0.0, 0.0 );			// Set Azimuth angle
-
     glDisable( GL_CULL_FACE );
     glPushMatrix();
     glTranslatef( 1.5, 0.0, 0.0 );
     glRotatef( -180.0, 1.0, 0.0, 1.0 );
+
+
+    /* Wheels */
+    
     // Parameters: height, radius, slices, stacks
-    drawGluCylinder(square_height, 5.0, 90, 1 );
+    drawGluCylinder(square_height, radius, 90, 1 );
     glTranslatef(square_height, 0, -square_width);
-    drawGluCylinder(square_height, 5.0, 90, 1 );
+    drawGluCylinder(square_height, radius, 90, 1 );
+
+
+    /* Cannon */
+
+    glRotatef( -180.0, 1.0, 0.0, 1.0 );
+    glTranslatef((-square_height)/2, z, (-square_width+10)/2);
+    drawGluCylinder(square_height, 4, 90, 1 );
 
     glPopMatrix();
     
-    
-
 }
