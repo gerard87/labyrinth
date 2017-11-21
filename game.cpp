@@ -37,6 +37,21 @@ long last_t = 0;
 int anglealpha = 75;
 int anglebeta = 35;
 
+void drawStrokeText(char*string,int x,int y,int z) {
+    
+    glPushMatrix();
+    glTranslatef(x, y+8,z);
+    glScalef(0.15f, 0.15f,z);
+
+    glColor3f(0.0, 0.0, 1.0);
+
+    for (char *c=string; *c != '\0'; c++) {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN , *c);
+    }
+    
+    glPopMatrix();
+}
+
 int main(int argc, char* argv[]) {
 
     int maze_cols, maze_rows;
@@ -192,15 +207,15 @@ void display() {
                     printSquare(row,col);
                     break;        
                 case 1:
-                    glColor3f(0.0 ,0.0, 1);
+                    glColor3f(0.0, 0.0, 1.0);
                     printCube(row, col);
                     break;
                 case 2: 
-                    glColor3f(0.0 ,0.8, 0.0);
+                    glColor3f(0.0, 0.8, 0.0);
                     printSquare(row, col);
                     break;
                 case 3: 
-                    glColor3f(0.8 ,0.0, 0.1);
+                    glColor3f(0.8, 0.0, 0.1);
                     printSquare(row, col);
                     break;            
             } 
@@ -213,6 +228,8 @@ void display() {
         else glColor3f(0.6, 0.1, 0.6);
         maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
     }
+
+    drawStrokeText("Time left to play: 25s", 25, HEIGHT - 50, 0);
 
     glutSwapBuffers();
 }
