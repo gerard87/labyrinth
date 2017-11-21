@@ -161,9 +161,9 @@ void display() {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-  
+ 
     PositionObserver(anglealpha,anglebeta,1000);
-  
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-WIDTH*0.6,WIDTH*0.6,-HEIGHT*0.6,HEIGHT*0.6,10,2000);
@@ -205,13 +205,15 @@ void display() {
                     break;            
             } 
       
-            
-            for(int i = 0; i < maze.getAgentsNum(); i++) {
-                if (i == 0) glColor3f(0.8, 0.5, 0.0);
-                else glColor3f(0.6, 0.1, 0.6);
-                maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
-            }
+                 
         }
+
+    for(int i = 0; i < maze.getAgentsNum(); i++) {
+        if (i == 0) glColor3f(0.8, 0.5, 0.0);
+        else glColor3f(0.6, 0.1, 0.6);
+        maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
+    }
+
     glutSwapBuffers();
 }
 
