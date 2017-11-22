@@ -51,6 +51,6 @@ class Particle {
         void setAngle(float angle);
         float getAngle();
         int getRotState();
-        void init_rotate(float angle, int duration);
+        void init_rotate(float angle, Directions::Direction direction, int duration);
     };
     #endif

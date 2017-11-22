@@ -92,10 +92,13 @@ void Particle::integrate(long t) {
     }
 }
 
-void Particle::init_rotate(float angle, int duration) {
-    this->v_angle = angle/duration;
-    this->rot_state = MOVE;
-    this->rot_time_remaining = duration;
+void Particle::init_rotate(float angle, Directions::Direction direction, int duration) {
+    if(this->rot_state == QUIET && angle != 0) {
+        this->v_angle = angle/duration;
+        this->rot_state = MOVE;
+        this->rot_time_remaining = duration;
+        this->orientation = direction;
+    }
 }
 
 void Particle::set_position(int x, int y) {

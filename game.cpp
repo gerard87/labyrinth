@@ -335,10 +335,8 @@ void moveAgent(int agentIndex, Directions::Direction direction) {
     float angle = calc_angle(direction, agent->getOrientation());
 
     if(agentIndex == 0) {
-        if(agent->getRotState() == Particle::QUIET && angle != 0) {
-            agent->setOrientation(direction);
-            agent->init_rotate(angle, 100);
-        }
+
+        agent->init_rotate(angle, direction, 100);
 
         if (maze.move(agentIndex, direction)) {
             agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
@@ -346,11 +344,7 @@ void moveAgent(int agentIndex, Directions::Direction direction) {
     } else {
         if (maze.move(agentIndex, direction)) {
 
-            if(agent->getRotState() == Particle::QUIET && angle != 0) {
-                agent->setOrientation(direction);
-                agent->init_rotate(angle, 100);
-            }
-
+            agent->init_rotate(angle, direction, 100);
             agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
         }
     }
