@@ -17,6 +17,7 @@ class Particle {
         Point position;
 
         float x, y;
+        int nextx = -1, nexty = -1;
         float vx, vy;
         int state;
         long time_remaining;
@@ -35,6 +36,8 @@ class Particle {
         Particle(int row, int col);
         void set_position(int x,int y);
         void init_movement(int destination_x,int destination_y,int duration);
+        void next_movement(int destination_x,int destination_y);
+
         void integrate(long t);
         void draw();
         int getState();

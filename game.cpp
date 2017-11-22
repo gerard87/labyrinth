@@ -42,7 +42,7 @@ int anglealpha = 75;
 int anglebeta = 35;
 
 void drawStrokeText(std::string text,int x,int y,int z) {
-    glDisable(GL_TEXTURE_2D); //added this
+    glDisable(GL_TEXTURE_2D);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -57,11 +57,10 @@ void drawStrokeText(std::string text,int x,int y,int z) {
         glColor3d(1.0, 0.0, 0.0);
         glutBitmapCharacter(font, c);
     }
-    glMatrixMode(GL_PROJECTION); //swapped this with...
+    glMatrixMode(GL_PROJECTION);
     glPopMatrix();
-    glMatrixMode(GL_MODELVIEW); //...this
+    glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
-    //added this
     glEnable(GL_TEXTURE_2D);
 }
 
@@ -328,13 +327,14 @@ void specialKeys(int key, int x, int y) {
             direction = Directions::STOP;
             break;
     }
+    float angle = calc_angle(direction,agent->getOrientation());
+    if(angle != 0) agent->init_rotate(angle, 100);
+    agent->setOrientation(direction);
     if (maze.move(0, direction)) {
         agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
     }
 
-    float angle = calc_angle(direction,agent->getOrientation());
-    if(angle != 0) agent->init_rotate(angle, 100);
-    agent->setOrientation(direction);
+    
 }
 
 void keyboard(unsigned char c,int x,int y) {

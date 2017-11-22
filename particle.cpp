@@ -45,12 +45,23 @@ float Particle::getAngle() {
     return this->angle;
 }
 
-void Particle::init_movement(int destination_x, int destination_y, int duration) {
-    this->vx = (destination_x - this->x)/duration;
-    this->vy = (destination_y - this->y)/duration;
+void Particle::next_movement(int destination_x, int destination_y) {
+    this->nextx = destination_x;
+    this->nexty = destination_y;
+}
 
-    this->state = MOVE;
-    this->time_remaining = duration;
+
+void Particle::init_movement(int destination_x, int destination_y, int duration) {
+    if (this->rot_state == MOVE) {
+        this->next_movement(destination_x, destination_y);
+    } else {
+        this->next_movement(-1, -1);
+        this->vx = (destination_x - this->x)/duration;
+        this->vy = (destination_y - this->y)/duration;
+
+        this->state = MOVE;
+        this->time_remaining = duration;
+    }
 }
 
 void Particle::integrate(long t) {
@@ -60,6 +71,10 @@ void Particle::integrate(long t) {
     } else if(this->rot_state==MOVE && t>=this->rot_time_remaining) {
         this->angle += this->v_angle*this->rot_time_remaining;
         this->rot_state=QUIET;
+        if (this->nextx > -1 && this->nexty > -1) {
+            this->init_movement((int)nextx, (int)nexty, 100);
+        }
+
     } else if(this->state==MOVE && t<this->time_remaining) {
         this->x += this->vx*t;
         this->y += this->vy*t;
