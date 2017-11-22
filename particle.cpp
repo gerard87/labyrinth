@@ -5,6 +5,7 @@ GLUquadric* myReusableQuadric = 0;
 
 Particle::Particle() {
     this->state = QUIET;
+    this->rot_state = QUIET;
     this->orientation = Directions::DOWN;
     this->angle = 0;
 }
@@ -12,6 +13,7 @@ Particle::Particle() {
 Particle::Particle(int row, int col) {
     this->position = Point(row, col);
     this->state = QUIET;
+    this->rot_state = QUIET;
     this->orientation = Directions::DOWN;
     this->angle = 0;
 }
@@ -43,6 +45,10 @@ void Particle::setAngle(float angle) {
 
 float Particle::getAngle() {
     return this->angle;
+}
+
+int Particle::getRotState() {
+    return this->rot_state;
 }
 
 void Particle::next_movement(int destination_x, int destination_y) {

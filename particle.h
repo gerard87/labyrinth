@@ -50,6 +50,7 @@ class Particle {
         Directions::Direction getOrientation();
         void setAngle(float angle);
         float getAngle();
+        int getRotState();
         void init_rotate(float angle, int duration);
     };
     #endif
