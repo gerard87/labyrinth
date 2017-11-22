@@ -333,12 +333,24 @@ void moveAgent(int agentIndex, Directions::Direction direction) {
     Particle* agent = maze.getAgent(agentIndex);
     Point pos = agent->getPosition();
     float angle = calc_angle(direction, agent->getOrientation());
-    if(angle != 0) agent->init_rotate(angle, 100);
-    agent->setOrientation(direction);
-    if (maze.move(agentIndex, direction)) {
-        agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
+
+    if(agentIndex == 0) {
+        agent->setOrientation(direction);
+        if(angle != 0) agent->init_rotate(angle, 100);
+
+        if (maze.move(agentIndex, direction)) {
+            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
+        }
+    } else {
+        if (maze.move(agentIndex, direction)) {
+            agent->setOrientation(direction);
+            if(angle != 0) agent->init_rotate(angle, 100);
+
+            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
+        }
     }
 }
+    
 
 void keyboard(unsigned char c,int x,int y) {
   int i,j;
