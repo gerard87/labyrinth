@@ -54,7 +54,13 @@ void Particle::init_movement(int destination_x, int destination_y, int duration)
 }
 
 void Particle::integrate(long t) {
-    if(this->state==MOVE && t<this->time_remaining) {
+    if(this->rot_state==MOVE && t<this->rot_time_remaining) {
+        this->angle += this->v_angle*t;
+        this->rot_time_remaining-=t;
+    } else if(this->rot_state==MOVE && t>=this->rot_time_remaining) {
+        this->angle += this->v_angle*this->rot_time_remaining;
+        this->rot_state=QUIET;
+    } else if(this->state==MOVE && t<this->time_remaining) {
         this->x += this->vx*t;
         this->y += this->vy*t;
         this->time_remaining-=t;
@@ -65,8 +71,10 @@ void Particle::integrate(long t) {
     }
 }
 
-void Particle::init_rotate(Directions::Direction direction, float angle, int duration) {
-
+void Particle::init_rotate(float angle, int duration) {
+    this->v_angle = angle/duration;
+    this->rot_state = MOVE;
+    this->rot_time_remaining = duration;
 }
 
 void Particle::set_position(int x, int y) {

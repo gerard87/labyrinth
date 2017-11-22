@@ -23,6 +23,9 @@ class Particle {
 
         Directions::Direction orientation;
         float angle;
+        float v_angle;
+        int rot_state;
+        long rot_time_remaining;
         
     public:
         static const int QUIET = 1;
@@ -44,6 +47,6 @@ class Particle {
         Directions::Direction getOrientation();
         void setAngle(float angle);
         float getAngle();
-        void init_rotate(Directions::Direction direction, float angle, int duration);
+        void init_rotate(float angle, int duration);
     };
     #endif

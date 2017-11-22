@@ -29,7 +29,7 @@ void PositionObserver(float alpha,float beta,int radi);
 void keyboard(unsigned char c,int x,int y);
 void printCube(int row, int col);
 void printSquare(int row, int col);
-float calc_angle(Directions::Direction direction, Directions::Direction orientation, float angle);
+float calc_angle(Directions::Direction direction, Directions::Direction orientation);
 
 Maze maze;
 int WIDTH;
@@ -331,10 +331,10 @@ void specialKeys(int key, int x, int y) {
     if (maze.move(0, direction)) {
         agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
     }
-    
-    float angle = calc_angle(direction,agent->getOrientation(), agent->getAngle());
+
+    float angle = calc_angle(direction,agent->getOrientation());
+    if(angle != 0) agent->init_rotate(angle, 100);
     agent->setOrientation(direction);
-    agent->setAngle(angle);
 }
 
 void keyboard(unsigned char c,int x,int y) {
@@ -355,7 +355,7 @@ void keyboard(unsigned char c,int x,int y) {
 void idle() {
     long t;
     
-    t = glutGet(GLUT_ELAPSED_TIME); 
+    t = glutGet(GLUT_ELAPSED_TIME);
 
     if(last_t != 0) {
         for(int i = 0; i < maze.getAgentsNum(); i++) maze.getAgent(i)->integrate(t-last_t);
@@ -399,11 +399,11 @@ void moveEnemy() {
         direction = minMoves[rand() % minMoves.size()];
 
         if (maze.move(i, direction)) {
-            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
+            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
 
-            float angle = calc_angle(direction,agent->getOrientation(), agent->getAngle());
+            float angle = calc_angle(direction,agent->getOrientation());
+            if(angle != 0) agent->init_rotate(angle, 100);
             agent->setOrientation(direction);
-            agent->setAngle(angle);
         }
     }
 }
@@ -416,26 +416,26 @@ int row_to_y(int row, int offset) {
     return (int)((row+offset)*(HEIGHT)/maze.getRows()) + ((row+1+offset)*(HEIGHT)/maze.getRows())/2 - (row+offset)*(HEIGHT)/maze.getRows()/2;
 }
 
-float calc_angle(Directions::Direction direction, Directions::Direction orientation, float angle) {
+float calc_angle(Directions::Direction direction, Directions::Direction orientation) {
     if(direction == Directions::LEFT) {
-        if(orientation == Directions::UP) return angle + 90.0f;
-        else if (orientation == Directions::DOWN) return angle + -90.0f;
-        else if(orientation == Directions::RIGHT) return angle + 180.0f;
-        else return angle;
+        if(orientation == Directions::UP) return 90.0f;
+        else if (orientation == Directions::DOWN) return -90.0f;
+        else if(orientation == Directions::RIGHT) return 180.0f;
+        else return 0;
     } else if(direction == Directions::RIGHT) {
-        if(orientation == Directions::UP) return angle + -90.0f;
-        else if (orientation == Directions::DOWN) return angle + 90.0f;
-        else if(orientation == Directions::LEFT) return angle + 180.0f;
-        else return angle;
+        if(orientation == Directions::UP) return -90.0f;
+        else if (orientation == Directions::DOWN) return 90.0f;
+        else if(orientation == Directions::LEFT) return 180.0f;
+        else return 0;
     } else if(direction == Directions::UP) {
-        if(orientation == Directions::DOWN) return angle + 180.0f;
-        else if(orientation == Directions::LEFT) return angle + -90.0f;
-        else if(orientation == Directions::RIGHT) return angle + 90.0f;
-        else return angle;
+        if(orientation == Directions::DOWN) return 180.0f;
+        else if(orientation == Directions::LEFT) return -90.0f;
+        else if(orientation == Directions::RIGHT) return 90.0f;
+        else return 0;
     } else if(direction == Directions::DOWN) {
-        if(orientation == Directions::UP) return angle + 180.0f;
-        else if(orientation == Directions::LEFT) return angle + 90.0f;
-        else if(orientation == Directions::RIGHT) return angle + -90.0f;
-        else return angle;
+        if(orientation == Directions::UP) return 180.0f;
+        else if(orientation == Directions::LEFT) return 90.0f;
+        else if(orientation == Directions::RIGHT) return -90.0f;
+        else return 0;
     }
 }
