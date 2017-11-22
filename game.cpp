@@ -30,6 +30,7 @@ void keyboard(unsigned char c,int x,int y);
 void printCube(int row, int col);
 void printSquare(int row, int col);
 float calc_angle(Directions::Direction direction, Directions::Direction orientation);
+void moveAgent(int agentIndex, Directions::Direction direction);
 
 Maze maze;
 int WIDTH;
@@ -308,8 +309,6 @@ void printCube(int row, int col) {
 
 void specialKeys(int key, int x, int y) {
     Directions::Direction direction;
-    Particle* agent = maze.getAgent(0);
-    Point pos = agent->getPosition();
     switch (key) {
         case GLUT_KEY_LEFT:
             direction = Directions::LEFT;
@@ -327,14 +326,18 @@ void specialKeys(int key, int x, int y) {
             direction = Directions::STOP;
             break;
     }
-    float angle = calc_angle(direction,agent->getOrientation());
+    moveAgent(0, direction);
+}
+
+void moveAgent(int agentIndex, Directions::Direction direction) {
+    Particle* agent = maze.getAgent(agentIndex);
+    Point pos = agent->getPosition();
+    float angle = calc_angle(direction, agent->getOrientation());
     if(angle != 0) agent->init_rotate(angle, 100);
     agent->setOrientation(direction);
-    if (maze.move(0, direction)) {
-        agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 100);
+    if (maze.move(agentIndex, direction)) {
+        agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
     }
-
-    
 }
 
 void keyboard(unsigned char c,int x,int y) {
@@ -398,13 +401,7 @@ void moveEnemy() {
 
         direction = minMoves[rand() % minMoves.size()];
 
-        if (maze.move(i, direction)) {
-            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
-
-            float angle = calc_angle(direction,agent->getOrientation());
-            if(angle != 0) agent->init_rotate(angle, 100);
-            agent->setOrientation(direction);
-        }
+        moveAgent(i, direction);
     }
 }
 
