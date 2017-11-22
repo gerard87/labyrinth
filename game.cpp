@@ -21,15 +21,12 @@ void moveEnemy();
 void setScreenSize();
 void specialKeys(int key, int x, int y);
 void idle();
-int col_to_x(int col, int offset);
-int row_to_y(int row, int offset);
 void timer(int extra);
 void timer2(int extra);
 void PositionObserver(float alpha,float beta,int radi);
 void keyboard(unsigned char c,int x,int y);
 void printCube(int row, int col);
 void printSquare(int row, int col);
-float calc_angle(Directions::Direction direction, Directions::Direction orientation);
 void moveAgent(int agentIndex, Directions::Direction direction);
 
 Maze maze;
@@ -108,8 +105,8 @@ int main(int argc, char* argv[]) {
         Particle* agent = maze.getAgent(i);
         Point pos = agent->getPosition();
 
-        int colX = col_to_x(pos.getCol(), 0);
-        int rowY = row_to_y(pos.getRow(), 0);
+        int colX = Utils::col_to_x(pos.getCol(), 0, WIDTH, maze.getColumns());
+        int rowY = Utils::row_to_y(pos.getRow(), 0, HEIGHT, maze.getRows());
         agent->set_position(colX, rowY);
     }
 
@@ -332,20 +329,22 @@ void specialKeys(int key, int x, int y) {
 void moveAgent(int agentIndex, Directions::Direction direction) {
     Particle* agent = maze.getAgent(agentIndex);
     Point pos = agent->getPosition();
-    float angle = calc_angle(direction, agent->getOrientation());
+    float angle = Utils::calc_angle(direction, agent->getOrientation());
 
     if(agentIndex == 0) {
 
         agent->init_rotate(angle, direction, 100);
 
         if (maze.move(agentIndex, direction)) {
-            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
+            agent->init_movement(Utils::col_to_x(pos.getCol(), direction.x, WIDTH, maze.getColumns()),
+                                Utils::row_to_y(pos.getRow(), direction.y, HEIGHT, maze.getRows()), 150);
         }
     } else {
         if (maze.move(agentIndex, direction)) {
 
             agent->init_rotate(angle, direction, 100);
-            agent->init_movement(col_to_x(pos.getCol(), direction.x), row_to_y(pos.getRow(), direction.y), 150);
+            agent->init_movement(Utils::col_to_x(pos.getCol(), direction.x, WIDTH, maze.getColumns()),
+                                Utils::row_to_y(pos.getRow(), direction.y, HEIGHT, maze.getRows()), 150);
         }
     }
 }
@@ -413,37 +412,5 @@ void moveEnemy() {
         direction = minMoves[rand() % minMoves.size()];
 
         moveAgent(i, direction);
-    }
-}
-
-int col_to_x(int col, int offset) {
-    return (int)(((col+offset)*(WIDTH)/maze.getColumns()) + ((col+1+offset)*(WIDTH)/maze.getColumns()))/2;
-}
-
-int row_to_y(int row, int offset) {
-    return (int)((row+offset)*(HEIGHT)/maze.getRows()) + ((row+1+offset)*(HEIGHT)/maze.getRows())/2 - (row+offset)*(HEIGHT)/maze.getRows()/2;
-}
-
-float calc_angle(Directions::Direction direction, Directions::Direction orientation) {
-    if(direction == Directions::LEFT) {
-        if(orientation == Directions::UP) return 90.0f;
-        else if (orientation == Directions::DOWN) return -90.0f;
-        else if(orientation == Directions::RIGHT) return 180.0f;
-        else return 0;
-    } else if(direction == Directions::RIGHT) {
-        if(orientation == Directions::UP) return -90.0f;
-        else if (orientation == Directions::DOWN) return 90.0f;
-        else if(orientation == Directions::LEFT) return 180.0f;
-        else return 0;
-    } else if(direction == Directions::UP) {
-        if(orientation == Directions::DOWN) return 180.0f;
-        else if(orientation == Directions::LEFT) return -90.0f;
-        else if(orientation == Directions::RIGHT) return 90.0f;
-        else return 0;
-    } else if(direction == Directions::DOWN) {
-        if(orientation == Directions::UP) return 180.0f;
-        else if(orientation == Directions::LEFT) return 90.0f;
-        else if(orientation == Directions::RIGHT) return -90.0f;
-        else return 0;
     }
 }
