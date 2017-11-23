@@ -36,7 +36,6 @@ class Particle {
         Particle(int row, int col);
         void set_position(int x,int y);
         void init_movement(int destination_x,int destination_y,int duration);
-        void next_movement(int destination_x,int destination_y);
 
         void integrate(long t);
         void draw();

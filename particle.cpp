@@ -51,23 +51,12 @@ int Particle::getRotState() {
     return this->rot_state;
 }
 
-void Particle::next_movement(int destination_x, int destination_y) {
-    this->nextx = destination_x;
-    this->nexty = destination_y;
-}
-
-
 void Particle::init_movement(int destination_x, int destination_y, int duration) {
-    if (this->rot_state == MOVE) {
-        this->next_movement(destination_x, destination_y);
-    } else {
-        this->next_movement(-1, -1);
-        this->vx = (destination_x - this->x)/duration;
-        this->vy = (destination_y - this->y)/duration;
+    this->vx = (destination_x - this->x)/duration;
+    this->vy = (destination_y - this->y)/duration;
 
-        this->state = MOVE;
-        this->time_remaining = duration;
-    }
+    this->state = MOVE;
+    this->time_remaining = duration;
 }
 
 void Particle::integrate(long t) {
@@ -93,7 +82,7 @@ void Particle::integrate(long t) {
 }
 
 void Particle::init_rotate(float angle, Directions::Direction direction, int duration) {
-    if(this->rot_state == QUIET && angle != 0) {
+    if(this->rot_state == QUIET && this->state == QUIET && angle != 0) {
         this->v_angle = angle/duration;
         this->rot_state = MOVE;
         this->rot_time_remaining = duration;
@@ -244,16 +233,9 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     // ----------------------
 
     glPushMatrix();
-    glTranslatef((x-square_height/2)-(width/2), radius, (y-square_width/2)-(height/2));
+    glTranslatef((x-square_height/2)-(width/2) +10, radius, (y-square_width/2)-(height/2)+10);
 
     glRotatef( this->angle, 0.0, 1.0, 0.0 );
-
-    float x_offset=0, z_offset=0;
-    if(this->orientation == Directions::UP) x_offset = z_offset = -square_width;
-    else if (this->orientation == Directions::LEFT) z_offset = -square_width;
-    else if (this->orientation == Directions::RIGHT) x_offset = -square_width;
-    glTranslatef(x_offset, 0, z_offset);
-
 
     glDisable( GL_CULL_FACE );
     glPushMatrix();
@@ -264,7 +246,9 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     /* Wheels */
     
     // Parameters: height, radius, slices, stacks
+    glTranslatef(-square_width/2, 0, -square_width/2);
     drawGluCylinder(square_height, radius, 90, 1 );
+
     glTranslatef(square_height, 0, -square_width);
     drawGluCylinder(square_height, radius, 90, 1 );
 

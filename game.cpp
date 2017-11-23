@@ -333,7 +333,7 @@ void moveAgent(int agentIndex, Directions::Direction direction) {
 
     if(agentIndex == 0) {
 
-        agent->init_rotate(angle, direction, 100);
+        agent->init_rotate(angle, direction, 200);
 
         if (maze.move(agentIndex, direction)) {
             agent->init_movement(Utils::col_to_x(pos.getCol(), direction.x, WIDTH, maze.getColumns()),
@@ -342,7 +342,7 @@ void moveAgent(int agentIndex, Directions::Direction direction) {
     } else {
         if (maze.move(agentIndex, direction)) {
 
-            agent->init_rotate(angle, direction, 100);
+            agent->init_rotate(angle, direction, 200);
             agent->init_movement(Utils::col_to_x(pos.getCol(), direction.x, WIDTH, maze.getColumns()),
                                 Utils::row_to_y(pos.getRow(), direction.y, HEIGHT, maze.getRows()), 150);
         }
