@@ -128,14 +128,20 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     float x = getX();
     float y = getY();
     float radius = square_width/4;
-    float diameter = radius * 2;
-    int z = ((x+square_height/2) - (x-square_height/2));
-    int ax = (x-square_height/2)-(width/2);
-    int bx = (x+square_height/2)-(width/2);
-    int ay = (y-square_width/2)-(height/2);
-    int by = (y+square_width/2)-(height/2);
-    int cannon_base_height = diameter;
+    float diameter = radius;
+    int z = (square_height/4)*3;
+    int ax = (-square_width)/2;
+    int bx = square_width/2;
+    int ay = (-square_width)/2;
+    int by = square_width/2;
+    int cannon_base_height = (z/5)*3;
     int border_size = radius/2;
+
+
+    glPushMatrix();
+    glTranslatef((x-square_height/2)-(width/2) +10, radius, (y-square_width/2)-(height/2)+10);
+
+    glRotatef( this->angle, 0.0, 1.0, 0.0 );
 
     /* Tank base */
 
@@ -229,14 +235,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     glEnd();
 
 
-
-    // ----------------------
-
-    glPushMatrix();
-    glTranslatef((x-square_height/2)-(width/2) +10, radius, (y-square_width/2)-(height/2)+10);
-
-    glRotatef( this->angle, 0.0, 1.0, 0.0 );
-
+    
     glDisable( GL_CULL_FACE );
     glPushMatrix();
     glTranslatef( 1.5, 0.0, 0.0 );
@@ -259,7 +258,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     /* Cannon */
 
     glRotatef( -180.0, 1.0, 0.0, 1.0 );
-    glTranslatef((-square_height)/2, z, (-square_width+10)/2);
+    glTranslatef((-square_height)/2, z+(cannon_base_height/2), (-square_width+10)/2);
     drawGluCylinder(square_height, radius/1.5, 90, 1 );
 
     glPopMatrix();
