@@ -127,15 +127,15 @@ void drawGluCylinder( double height, double radius, int slices, int stacks ) {
 void Particle::draw(float square_width, float square_height, int width, int height) {
     float x = getX();
     float y = getY();
-    float radius = 5.0;
+    float radius = square_width/4;
     float diameter = radius * 2;
     int z = ((x+square_height/2) - (x-square_height/2));
-    int cannon_base_height = 10;
     int ax = (x-square_height/2)-(width/2);
     int bx = (x+square_height/2)-(width/2);
     int ay = (y-square_width/2)-(height/2);
     int by = (y+square_width/2)-(height/2);
-    int border_size = 3;
+    int cannon_base_height = diameter;
+    int border_size = radius/2;
 
     /* Tank base */
 
@@ -260,7 +260,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
 
     glRotatef( -180.0, 1.0, 0.0, 1.0 );
     glTranslatef((-square_height)/2, z, (-square_width+10)/2);
-    drawGluCylinder(square_height, 4, 90, 1 );
+    drawGluCylinder(square_height, radius/1.5, 90, 1 );
 
     glPopMatrix();
     
