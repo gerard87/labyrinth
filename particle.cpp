@@ -249,7 +249,10 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     glTranslatef(-square_width/2, 0, -square_width/2);
     drawGluCylinder(square_height, radius, 90, 1 );
 
-    glTranslatef(square_height, 0, -square_width);
+    glTranslatef(square_width/2, 0, -square_width);
+    drawGluCylinder(square_height, radius, 90, 1 );
+
+    glTranslatef(square_height/2, 0, -square_width);
     drawGluCylinder(square_height, radius, 90, 1 );
 
 
