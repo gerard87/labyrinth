@@ -9,6 +9,7 @@
 #include "maze.h"
 #include "directions.h"
 #include "utils.h"
+#include "jpeglib.h"
 
 #define HEIGHT 1000
 
@@ -27,7 +28,10 @@ void PositionObserver(float alpha,float beta,int radi);
 void keyboard(unsigned char c,int x,int y);
 void printCube(int row, int col);
 void printSquare(int row, int col);
+void printFloor(int row, int col);
 void moveAgent(int agentIndex, Directions::Direction direction);
+void LoadTexture(char *filename,int dim);
+void ReadJPEG(char *filename,unsigned char **image,int *width, int *height);
 
 Maze maze;
 int WIDTH;
@@ -123,7 +127,9 @@ int main(int argc, char* argv[]) {
     glutIdleFunc(idle);
     glutTimerFunc(0, timer, 0);
     glutTimerFunc(1000, timer2, 0);
-    
+
+    glBindTexture(GL_TEXTURE_2D,0);
+    LoadTexture("img/grass.jpg",64);
     
     glutMainLoop();
 
@@ -198,6 +204,8 @@ void display() {
     //glPolygonMode(GL_BACK,GL_LINE);
     glPolygonMode(GL_BACK,GL_FILL);
 
+    glDisable(GL_TEXTURE_2D);
+
     glColor3f(0.7, 0.8, 0.7);
     glBegin(GL_QUADS);
     glVertex3i(-1 * (3 * WIDTH), -1, -1 * 3 * HEIGHT);
@@ -213,7 +221,7 @@ void display() {
             switch (maze.getValue(row,col)) {
                 case 0:
                     glColor3f(0.8, 0.8, 0.8);
-                    printSquare(row,col);
+                    printFloor(row,col);
                     break;        
                 case 1:
                     glColor3f(0.0, 0.0, 1.0);
@@ -231,7 +239,7 @@ void display() {
       
                  
         }
-
+        
     for(int i = 0; i < maze.getAgentsNum(); i++) {
         if (i == 0) glColor3f(0.8, 0.5, 0.0);
         else glColor3f(0.6, 0.1, 0.6);
@@ -243,14 +251,29 @@ void display() {
     glutSwapBuffers();
 }
 
+void printFloor(int row, int col) {
+    int w = WIDTH;
+    int h = HEIGHT;
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,0);
+    glBegin(GL_QUADS);
+    glTexCoord2f(-4.0,0.0); glVertex3i((col*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
+    glTexCoord2f(4.0,0.0); glVertex3i((col*w/maze.getColumns())-(w/2), 0, ((row+1)*h/maze.getRows())-(h/2)); 
+    glTexCoord2f(4.0,4.0); glVertex3i(((col+1)*w/maze.getColumns())-(w/2),0, ((row+1)*h/maze.getRows())-(h/2)); 
+    glTexCoord2f(-4.0,4.0); glVertex3i(((col+1)*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+}
+
 void printSquare(int row, int col) {
     int w = WIDTH;
     int h = HEIGHT;
+
     glBegin(GL_QUADS);
     glVertex3i((col*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
-    glVertex3i(((col+1)*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
-    glVertex3i(((col+1)*w/maze.getColumns())-(w/2),0, ((row+1)*h/maze.getRows())-(h/2)); 
     glVertex3i((col*w/maze.getColumns())-(w/2), 0, ((row+1)*h/maze.getRows())-(h/2)); 
+    glVertex3i(((col+1)*w/maze.getColumns())-(w/2),0, ((row+1)*h/maze.getRows())-(h/2)); 
+    glVertex3i(((col+1)*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
     glEnd();
 }
 
@@ -259,47 +282,47 @@ void printCube(int row, int col) {
     int z = (((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()))/2; 
     glBegin(GL_QUADS);
     glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
     glBegin(GL_QUADS);
     glVertex3i((col*squareL)-(WIDTH/2), 0, ((row*squareL)) - (HEIGHT/2));
-    glVertex3i((col*squareL)-(WIDTH/2), 0, (((row+1)*squareL))- (HEIGHT/2));
-    glVertex3i(((col+1)*squareL)-(WIDTH/2),0, (((row+1)*squareL))- (HEIGHT/2));
     glVertex3i(((col+1)*squareL)-(WIDTH/2), 0, ((row*squareL))- (HEIGHT/2));
+    glVertex3i(((col+1)*squareL)-(WIDTH/2),0, (((row+1)*squareL))- (HEIGHT/2));
+    glVertex3i((col*squareL)-(WIDTH/2), 0, (((row+1)*squareL))- (HEIGHT/2));
     glEnd();
 
     glColor3f(0.0 ,0.5, 0.8);
 
     glBegin(GL_QUADS);
     glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2)); 
-    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
     glBegin(GL_QUADS);
     glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
 
     glBegin(GL_QUADS);
     glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
     glBegin(GL_QUADS);
     glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
 }
@@ -413,4 +436,79 @@ void moveEnemy() {
 
         moveAgent(i, direction);
     }
+}
+
+
+void LoadTexture(char *filename,int dim) {
+    unsigned char *buffer, *buffer2;
+    int width,height;
+    long i,j;
+    long k,h;
+
+    ReadJPEG(filename,&buffer,&width,&height);
+
+    buffer2=(unsigned char*)malloc(dim*dim*3);
+
+    for(i=0;i<dim;i++)
+        for(j=0;j<dim;j++) {
+            k=i*height/dim;
+            h=j*width/dim;
+            
+            buffer2[3*(i*dim+j)]=buffer[3*(k*width +h)];
+            buffer2[3*(i*dim+j)+1]=buffer[3*(k*width +h)+1];
+            buffer2[3*(i*dim+j)+2]=buffer[3*(k*width +h)+2];
+        }
+
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,dim,dim,0,GL_RGB,GL_UNSIGNED_BYTE,buffer2);
+    
+
+    free(buffer);
+    free(buffer2);
+}
+
+void ReadJPEG(char *filename,unsigned char **image,int *width, int *height) {
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    FILE * infile;
+    unsigned char **buffer;
+    int i,j;
+
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_decompress(&cinfo);
+
+
+    if ((infile = fopen(filename, "rb")) == NULL) {
+        printf("Unable to open file %s\n",filename);
+        exit(1);
+    }
+
+    jpeg_stdio_src(&cinfo, infile);
+    jpeg_read_header(&cinfo, TRUE);
+    jpeg_calc_output_dimensions(&cinfo);
+    jpeg_start_decompress(&cinfo);
+
+    *width = cinfo.output_width;
+    *height  = cinfo.output_height;
+
+    *image=(unsigned char*)malloc(cinfo.output_width*cinfo.output_height*cinfo.output_components);
+
+    buffer=(unsigned char **)malloc(1*sizeof(unsigned char **));
+    buffer[0]=(unsigned char *)malloc(cinfo.output_width*cinfo.output_components);
+
+    i=0;
+    while (cinfo.output_scanline < cinfo.output_height) {
+        jpeg_read_scanlines(&cinfo, buffer, 1);
+
+        for(j=0;j<cinfo.output_width*cinfo.output_components;j++) {
+            (*image)[i]=buffer[0][j];
+            i++;
+        }   
+
+    }
+
+    free(buffer);
+    jpeg_finish_decompress(&cinfo);
 }
