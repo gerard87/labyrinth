@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
     glutTimerFunc(1000, timer2, 0);
 
     glBindTexture(GL_TEXTURE_2D,0);
-    LoadTexture("img/grass.jpg",64);
+    LoadTexture((char*)"img/grass.jpg",64);
     
     glutMainLoop();
 
