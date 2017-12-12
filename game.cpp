@@ -25,8 +25,8 @@ void timer(int extra);
 void timer2(int extra);
 void PositionObserver(float alpha,float beta,int radi);
 void keyboard(unsigned char c,int x,int y);
-void printCube(int row, int col);
-void printSquare(int row, int col);
+void printCube(int row, int col, GLfloat *material);
+void printSquare(int row, int col, GLfloat *material);
 void moveAgent(int agentIndex, Directions::Direction direction);
 
 Maze maze;
@@ -116,6 +116,8 @@ int main(int argc, char* argv[]) {
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Labyrinth Race");
     glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_LIGHTING);
     
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
@@ -180,6 +182,10 @@ void PositionObserver(float alpha,float beta,int radi)
 }
 
 void display() {
+    GLint position[4];
+    GLfloat color[4];
+    GLfloat material[4];
+
     glClearColor(0.0,0.0,0.0,0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -198,8 +204,30 @@ void display() {
     //glPolygonMode(GL_BACK,GL_LINE);
     glPolygonMode(GL_BACK,GL_FILL);
 
-    glColor3f(0.7, 0.8, 0.7);
+    //-- Ambient light
+    position[0]=0; position[1]=0; position[2]=0; position[3]=1; 
+    glLightiv(GL_LIGHT0,GL_POSITION,position);
+    
+    color[0]=0.1; color[1]=0.1; color[2]=0.1; color[3]=1;
+    glLightfv(GL_LIGHT0,GL_AMBIENT,color);
+
+    color[0]=0.0; color[1]=0.0; color[2]=0.0; color[3]=1;
+    glLightfv(GL_LIGHT0,GL_DIFFUSE,color);
+    glLightfv(GL_LIGHT0,GL_SPECULAR,color);
+
+    glEnable(GL_LIGHT0);
+    color[0]=0.0; color[1]=0.0; color[2]=0.0; color[3]=1;
+    glLightfv(GL_LIGHT0,GL_AMBIENT,color);
+    glLightfv(GL_LIGHT0,GL_SPECULAR,color);
+    //-- End ambient
+
+    
+
+    material[0]=0.7; material[1]=0.8; material[2]=0.7; material[3]=1.0; 
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
+    // glColor3f(0.7, 0.8, 0.7);
     glBegin(GL_QUADS);
+    glNormal3f(0, 0, 1);
     glVertex3i(-1 * (3 * WIDTH), -1, -1 * 3 * HEIGHT);
     glVertex3i(-1 * (3 * WIDTH), -1, 3 * HEIGHT);
     glVertex3i(3 * WIDTH, -1, 3 * HEIGHT); 
@@ -212,30 +240,75 @@ void display() {
             
             switch (maze.getValue(row,col)) {
                 case 0:
-                    glColor3f(0.8, 0.8, 0.8);
-                    printSquare(row,col);
+                    material[0]=0.8; material[1]=0.8; material[2]=0.8; material[3]=1.0;
+                    printSquare(row, col, material);
                     break;        
                 case 1:
-                    glColor3f(0.0, 0.0, 1.0);
-                    printCube(row, col);
+                    material[0]=0.0; material[1]=0.0; material[2]=1.0; material[3]=1.0;
+                    printCube(row, col, material);
                     break;
                 case 2: 
-                    glColor3f(0.0, 0.8, 0.0);
-                    printSquare(row, col);
+                    material[0]=0.0; material[1]=0.8; material[2]=0.0; material[3]=1.0;
+                    printSquare(row, col, material);
                     break;
                 case 3: 
-                    glColor3f(0.8, 0.0, 0.1);
-                    printSquare(row, col);
+                    material[0]=0.8; material[1]=0.0; material[2]=0.1; material[3]=1.0;
+                    printSquare(row, col, material);
                     break;            
             } 
-      
-                 
+            
         }
 
+    GLfloat *dir;
+    GLfloat up[] = {0,1,-1};
+    GLfloat down[] = {0,1,1};
+    GLfloat left[] = {-1,1,0};
+    GLfloat right[] = {1,1,0};
+
+    int light; 
     for(int i = 0; i < maze.getAgentsNum(); i++) {
-        if (i == 0) glColor3f(0.8, 0.5, 0.0);
-        else glColor3f(0.6, 0.1, 0.6);
-        maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
+        if (i == 0) {material[0]=0.8; material[1]=0.5; material[2]=0.0; material[3]=1.0; }
+        else { material[0]=0.6; material[1]=0.1; material[2]=0.6; material[3]=1.0; }
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
+
+        Particle *agent = maze.getAgent(i);
+
+        agent->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
+
+        if (i == 0) {
+            light = GL_LIGHT1;
+        } else if (i == 1) {
+            light = GL_LIGHT2;
+        }
+
+        if(agent->getOrientation() == Directions::LEFT) {
+            dir = left;
+        } else if(agent->getOrientation() == Directions::RIGHT) {
+            dir = right;
+        } else if(agent->getOrientation() == Directions::UP) {
+            dir = up;
+        } else if(agent->getOrientation() == Directions::DOWN) {
+            dir = down;
+        }
+        //-- Direccional
+    
+        position[0]=agent->getX()-WIDTH/2; position[1]=15; position[2]=agent->getY()-HEIGHT/2; position[3]=1; 
+        glLightiv(light,GL_POSITION,position);
+        
+        glLightfv (light,GL_SPOT_DIRECTION, dir);
+
+        color[0]=0.8; color[1]=0.8; color[2]=0.8; color[3]=1;
+        glLightfv(light,GL_DIFFUSE,color);
+        
+        glLightf(light,GL_CONSTANT_ATTENUATION,1);
+        glLightf(light,GL_LINEAR_ATTENUATION,0.0);
+        glLightf(light,GL_QUADRATIC_ATTENUATION,0.0);
+
+        glLightf(light,GL_SPOT_CUTOFF,60.0);
+        glLightf(light,GL_SPOT_EXPONENT, 2.0);
+        
+        glEnable(light);
+        //--End
     }
 
     drawStrokeText("Time left to play: " + std::to_string((int)(timeleft)) +"s", 25, HEIGHT - 50, 0);
@@ -243,10 +316,12 @@ void display() {
     glutSwapBuffers();
 }
 
-void printSquare(int row, int col) {
+void printSquare(int row, int col, GLfloat *material) {
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
     int w = WIDTH;
     int h = HEIGHT;
     glBegin(GL_QUADS);
+    glNormal3f(0, 0, 1);
     glVertex3i((col*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
     glVertex3i(((col+1)*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
     glVertex3i(((col+1)*w/maze.getColumns())-(w/2),0, ((row+1)*h/maze.getRows())-(h/2)); 
@@ -254,10 +329,13 @@ void printSquare(int row, int col) {
     glEnd();
 }
 
-void printCube(int row, int col) {   
+void printCube(int row, int col, GLfloat *material) {  
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material); 
     int squareL = WIDTH/maze.getColumns();
     int z = (((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()))/2; 
+    
     glBegin(GL_QUADS);
+    glNormal3f(0, 0, -1);
     glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
@@ -265,15 +343,19 @@ void printCube(int row, int col) {
     glEnd();
 
     glBegin(GL_QUADS);
+    glNormal3f(0, 0, -1);
     glVertex3i((col*squareL)-(WIDTH/2), 0, ((row*squareL)) - (HEIGHT/2));
     glVertex3i((col*squareL)-(WIDTH/2), 0, (((row+1)*squareL))- (HEIGHT/2));
     glVertex3i(((col+1)*squareL)-(WIDTH/2),0, (((row+1)*squareL))- (HEIGHT/2));
     glVertex3i(((col+1)*squareL)-(WIDTH/2), 0, ((row*squareL))- (HEIGHT/2));
     glEnd();
 
-    glColor3f(0.0 ,0.5, 0.8);
+    GLfloat material2[4];
+    material2[0] = 0.0; material2[1] = 0.5; material2[2] = 0.8; material2[3] = 1.0;
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material2); 
 
     glBegin(GL_QUADS);
+    glNormal3f(1,0,0);
     glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2)); 
