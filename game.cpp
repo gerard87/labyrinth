@@ -262,10 +262,14 @@ void display() {
                     printCube(row, col);
                     break;
                 case 2: 
+                    material[0]=0.0; material[1]=0.8; material[2]=0.0; material[3]=1.0; 
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
                     glColor3f(0.0, 0.8, 0.0);
                     printSquare(row, col);
                     break;
                 case 3: 
+                    material[0]=0.8; material[1]=0.0; material[2]=0.0; material[3]=1.0; 
+                    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
                     glColor3f(0.8, 0.0, 0.1);
                     printSquare(row, col);
                     break;            
