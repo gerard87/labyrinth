@@ -190,6 +190,11 @@ void PositionObserver(float alpha,float beta,int radi)
 }
 
 void display() {
+
+    GLint position[4];
+    GLfloat color[4];
+    GLfloat material[4];
+
     glClearColor(0.0,0.0,0.0,0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -210,7 +215,27 @@ void display() {
 
     glDisable(GL_TEXTURE_2D);
 
-    glColor3f(0.7, 0.8, 0.7);
+
+    //-- Ambient light
+    position[0]=0; position[1]=0; position[2]=0; position[3]=1; 
+    glLightiv(GL_LIGHT0,GL_POSITION,position);
+    
+    color[0]=0.1; color[1]=0.1; color[2]=0.1; color[3]=1;
+    glLightfv(GL_LIGHT0,GL_AMBIENT,color);
+
+    color[0]=0.0; color[1]=0.0; color[2]=0.0; color[3]=1;
+    glLightfv(GL_LIGHT0,GL_DIFFUSE,color);
+    glLightfv(GL_LIGHT0,GL_SPECULAR,color);
+
+    glEnable(GL_LIGHT0);
+    color[0]=0.0; color[1]=0.0; color[2]=0.0; color[3]=1;
+    glLightfv(GL_LIGHT0,GL_AMBIENT,color);
+    glLightfv(GL_LIGHT0,GL_SPECULAR,color);
+    //-- End ambient
+
+
+    material[0]=0.7; material[1]=0.8; material[2]=0.7; material[3]=1.0; 
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
     glBegin(GL_QUADS);
     glVertex3i(-1 * (3 * WIDTH), -1, -1 * 3 * HEIGHT);
     glVertex3i(-1 * (3 * WIDTH), -1, 3 * HEIGHT);
@@ -243,11 +268,57 @@ void display() {
       
                  
         }
+
+
+    GLfloat *dir;
+    GLfloat up[] = {0,1,-1};
+    GLfloat down[] = {0,1,1};
+    GLfloat left[] = {-1,1,0};
+    GLfloat right[] = {1,1,0};
         
     for(int i = 0; i < maze.getAgentsNum(); i++) {
-        if (i == 0) glColor3f(0.8, 0.5, 0.0);
-        else glColor3f(0.6, 0.1, 0.6);
-        maze.getAgent(i)->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
+        if (i == 0) {material[0]=0.8; material[1]=0.5; material[2]=0.0; material[3]=1.0; }
+        else { material[0]=0.6; material[1]=0.1; material[2]=0.6; material[3]=1.0; }
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
+
+        Particle *agent = maze.getAgent(i);        
+
+        agent->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
+
+        if (i == 0) {
+            light = GL_LIGHT1;
+        } else if (i == 1) {
+            light = GL_LIGHT2;
+        }
+
+        if(agent->getOrientation() == Directions::LEFT) {
+            dir = left;
+        } else if(agent->getOrientation() == Directions::RIGHT) {
+            dir = right;
+        } else if(agent->getOrientation() == Directions::UP) {
+            dir = up;
+        } else if(agent->getOrientation() == Directions::DOWN) {
+            dir = down;
+        }
+
+        //-- Direccional
+        position[0]=agent->getX()-WIDTH/2; position[1]=15; position[2]=agent->getY()-HEIGHT/2; position[3]=1; 
+        glLightiv(light,GL_POSITION,position);
+        
+        glLightfv (light,GL_SPOT_DIRECTION, dir);
+
+        color[0]=0.8; color[1]=0.8; color[2]=0.8; color[3]=1;
+        glLightfv(light,GL_DIFFUSE,color);
+        
+        glLightf(light,GL_CONSTANT_ATTENUATION,1);
+        glLightf(light,GL_LINEAR_ATTENUATION,0.0);
+        glLightf(light,GL_QUADRATIC_ATTENUATION,0.0);
+
+        glLightf(light,GL_SPOT_CUTOFF,60.0);
+        glLightf(light,GL_SPOT_EXPONENT, 2.0);
+        
+        glEnable(light);
+        //--End
     }
 
     drawStrokeText("Time left to play: " + std::to_string((int)(timeleft)) +"s", 25, HEIGHT - 50, 0);
@@ -530,6 +601,6 @@ void ReadJPEG(char *filename,unsigned char **image,int *width, int *height) {
 void setTexture (unsigned char* texture) {
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+    glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
     glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,DIM,DIM,0,GL_RGB,GL_UNSIGNED_BYTE, texture);
 }
