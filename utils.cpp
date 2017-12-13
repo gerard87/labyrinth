@@ -37,3 +37,36 @@ float Utils::calc_angle(Directions::Direction direction, Directions::Direction o
         else return 0;
     }
 }
+
+float * Utils::getNormalFromSquare(int *p1, int *p2, int *p3) {
+    float a[3], b[3], normal[3];
+    a[0] = p3[0] - p2[0];
+    a[1] = p3[1] - p2[1];
+    a[2] = p3[2] - p2[2];
+
+    b[0] = p1[0] - p2[0];
+    b[1] = p1[1] - p2[1];
+    b[2] = p1[2] - p2[2];
+
+    // a x b;
+    normal[0] = (a[1] * b[2] - a[2] * b[1]);
+    normal[1] = (a[2] * b[0] - a[0] * b[2]);
+    normal[2] = (a[0] * b[1] - a[1] * b[0]);
+
+    float modulus = (float)sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+
+    if (modulus == 0.0f) {
+        modulus = 1.0f;
+    }
+
+    normal[0] /= modulus;
+    normal[1] /= modulus;
+    normal[2] /= modulus;
+
+    float * w = (float *)malloc(sizeof(float) * 3);
+    w[0] = normal[0];
+    w[1] = normal[1];
+    w[2] = normal[2];
+
+    return w;
+}

@@ -9,5 +9,6 @@ class Utils {
         static int col_to_x(int col, int offset, int width, int maze_columns);
         static int row_to_y(int row, int offset, int height, int maze_rows);
         static float calc_angle(Directions::Direction direction, Directions::Direction orientation);
+        static float * getNormalFromSquare(int *p1, int *p2, int *p3);
 };
 #endif
