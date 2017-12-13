@@ -189,8 +189,8 @@ void Particle::draw(float square_width, float square_height, int width, int heig
 
 
     /* Cannon base */
-
-    glColor3f(0.3, 0.3, 0.3);
+    GLfloat material[] = {0.3, 0.3, 0.3,1.0};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
 
     glBegin(GL_QUADS);
     glVertex3i(ax + border_size, z+cannon_base_height, ay + border_size);
@@ -234,16 +234,14 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     glVertex3i(bx - border_size, z+cannon_base_height, by - border_size);
     glEnd();
 
-
-    
     glDisable( GL_CULL_FACE );
     glPushMatrix();
     glTranslatef( 1.5, 0.0, 0.0 );
     glRotatef( -180.0, 1.0, 0.0, 1.0 );
     
-
     /* Wheels */
-    
+    material[0] = 0.0; material[1] = 0.0; material[2] = 0.0; material[3] = 1.0;
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
     // Parameters: height, radius, slices, stacks
     glTranslatef(-square_width/2, 0, -square_width/2);
     drawGluCylinder(square_height, radius, 90, 1 );
@@ -256,7 +254,6 @@ void Particle::draw(float square_width, float square_height, int width, int heig
 
 
     /* Cannon */
-
     glRotatef( -180.0, 1.0, 0.0, 1.0 );
     glTranslatef((-square_height)/2, z+(cannon_base_height/2), (-square_width+10)/2);
     drawGluCylinder(square_height, radius/1.5, 90, 1 );

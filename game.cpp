@@ -32,6 +32,8 @@ void moveAgent(int agentIndex, Directions::Direction direction);
 unsigned char* LoadTexture(char *filename,int dim);
 void ReadJPEG(char *filename,unsigned char **image,int *width, int *height);
 void setTexture (unsigned char* texture);
+void setMaterialForTexture();
+
 
 Maze maze;
 int WIDTH;
@@ -122,6 +124,8 @@ int main(int argc, char* argv[]) {
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Labyrinth Race");
     glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_LIGHTING);
     
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
@@ -275,6 +279,7 @@ void display() {
     GLfloat down[] = {0,1,1};
     GLfloat left[] = {-1,1,0};
     GLfloat right[] = {1,1,0};
+    GLfloat light;
         
     for(int i = 0; i < maze.getAgentsNum(); i++) {
         if (i == 0) {material[0]=0.8; material[1]=0.5; material[2]=0.0; material[3]=1.0; }
@@ -326,18 +331,28 @@ void display() {
     glutSwapBuffers();
 }
 
+void setMaterialForTexture() {
+    GLfloat texture_material[] = {1.0,1.0,1.0,1.0};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, texture_material);
+}
+
 void printFloor(int row, int col) {
     int w = WIDTH;
     int h = HEIGHT;
 
+    setMaterialForTexture();
     setTexture(grass);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,0);
     glBegin(GL_QUADS);
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(0.0,1.0); glVertex3i((col*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(1.0,1.0); glVertex3i((col*w/maze.getColumns())-(w/2), 0, ((row+1)*h/maze.getRows())-(h/2)); 
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(1.0,0.0); glVertex3i(((col+1)*w/maze.getColumns())-(w/2),0, ((row+1)*h/maze.getRows())-(h/2)); 
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(0.0,0.0); glVertex3i(((col+1)*w/maze.getColumns())-(w/2), 0, (row*h/maze.getRows())-(h/2));
     glEnd();
     glDisable(GL_TEXTURE_2D);
@@ -359,15 +374,20 @@ void printCube(int row, int col) {
     int squareL = WIDTH/maze.getColumns();
     int z = (((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()))/2; 
 
+    setMaterialForTexture();
     setTexture(top);
     
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,0);
 
     glBegin(GL_QUADS);
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(0.0,1.0); glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(1.0,1.0); glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(1.0,0.0); glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glNormal3f(0.0, 0.0, 1.0);
     glTexCoord2f(0.0,0.0); glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
@@ -381,6 +401,7 @@ void printCube(int row, int col) {
     
     setTexture(wall);
 
+    // N
     glBegin(GL_QUADS);
     glTexCoord2f(0.0,1.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,1.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
@@ -388,24 +409,27 @@ void printCube(int row, int col) {
     glTexCoord2f(0.0,0.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
-    
-
+    // W
     glBegin(GL_QUADS);
+    glNormal3f(1.0, 0.0, 0.0);
     glTexCoord2f(0.0,1.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,1.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,0.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(0.0,0.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
-
+    // E
     glBegin(GL_QUADS);
+    glNormal3f(-1.0, 0.0, 0.0);
     glTexCoord2f(1.0,1.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,0.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(0.0,0.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(0.0,1.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glEnd();
 
+    // S
     glBegin(GL_QUADS);
+    glNormal3f(-1.0, 1.0, 0.0);
     glTexCoord2f(1.0,1.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,0.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(0.0,0.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
