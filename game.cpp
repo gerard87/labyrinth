@@ -33,6 +33,7 @@ unsigned char* LoadTexture(char *filename,int dim);
 void ReadJPEG(char *filename,unsigned char **image,int *width, int *height);
 void setTexture (unsigned char* texture);
 void setMaterialForTexture();
+float * getNormalFromSquare(int *p1, int *p2, int *p3);
 
 
 Maze maze;
@@ -374,21 +375,44 @@ void printCube(int row, int col) {
     int squareL = WIDTH/maze.getColumns();
     int z = (((col+1)*WIDTH/maze.getColumns()) - (col*WIDTH/maze.getColumns()))/2; 
 
+    int p1[3];
+    int p2[3];
+    int p3[3];
+    int p4[3];
+
     setMaterialForTexture();
     setTexture(top);
     
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,0);
 
+    p1[0] = (col*WIDTH/maze.getColumns())-(WIDTH/2);
+    p1[1] = z;
+    p1[2] = (row*HEIGHT/maze.getRows())-(HEIGHT/2);
+
+    p2[0] = (col*WIDTH/maze.getColumns())-(WIDTH/2);
+    p2[1] = z;
+    p2[2] = ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2);
+
+    p3[0] = ((col+1)*WIDTH/maze.getColumns())-(WIDTH/2);
+    p3[1] = z;
+    p3[2] = ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2);
+
+    p4[0] = ((col+1)*WIDTH/maze.getColumns())-(WIDTH/2);
+    p4[1] = z;
+    p4[2] = (row*HEIGHT/maze.getRows())-(HEIGHT/2);
+
+    float * normal = getNormalFromSquare(p1, p2, p3);
+
     glBegin(GL_QUADS);
-    glNormal3f(0.0, 0.0, 1.0);
-    glTexCoord2f(0.0,1.0); glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glNormal3f(0.0, 0.0, 1.0);
-    glTexCoord2f(1.0,1.0); glVertex3i((col*WIDTH/maze.getColumns())-(WIDTH/2), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glNormal3f(0.0, 0.0, 1.0);
-    glTexCoord2f(1.0,0.0); glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2),z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glNormal3f(0.0, 0.0, 1.0);
-    glTexCoord2f(0.0,0.0); glVertex3i(((col+1)*WIDTH/maze.getColumns())-(WIDTH/2), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(0.0,1.0); glVertex3i(p1[0], p1[1], p1[2]);
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(1.0,1.0); glVertex3i(p2[0], p2[1], p2[2]);
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(1.0,0.0); glVertex3i(p3[0], p3[1], p3[2]);
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(0.0,0.0); glVertex3i(p4[0], p4[1], p4[2]);
     glEnd();
 
     glBegin(GL_QUADS);
@@ -398,7 +422,6 @@ void printCube(int row, int col) {
     glTexCoord2f(0.0,0.0); glVertex3i((col*squareL)-(WIDTH/2), 0, (((row+1)*squareL))- (HEIGHT/2));
     glEnd();
 
-    
     setTexture(wall);
 
     // N
@@ -411,7 +434,7 @@ void printCube(int row, int col) {
 
     // W
     glBegin(GL_QUADS);
-    glNormal3f(1.0, 0.0, 0.0);
+    //glNormal3f(1.0, 0.0, 0.0);
     glTexCoord2f(0.0,1.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,1.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,0.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
@@ -420,7 +443,7 @@ void printCube(int row, int col) {
 
     // E
     glBegin(GL_QUADS);
-    glNormal3f(-1.0, 0.0, 0.0);
+    //glNormal3f(-1.0, 0.0, 0.0);
     glTexCoord2f(1.0,1.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(1.0,0.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
     glTexCoord2f(0.0,0.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, (row*HEIGHT/maze.getRows())-(HEIGHT/2));
@@ -428,16 +451,58 @@ void printCube(int row, int col) {
     glEnd();
 
     // S
+    p1[0] = ((col*WIDTH/maze.getColumns())-(WIDTH/2)); p1[1] = z; p1[2] = ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2);
+    p2[0] = ((col*WIDTH/maze.getColumns())-(WIDTH/2)); p2[1] = 0; p2[2] = ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2);
+    p3[0] = (((col+1)*WIDTH/maze.getColumns())-(WIDTH/2));p3[1] = 0; p3[2] = ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2);
+    p4[0] = (((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)); p4[1] = z; p4[2] = ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2);
+
+    normal = getNormalFromSquare(p1, p2, p3);
+
     glBegin(GL_QUADS);
-    glNormal3f(-1.0, 1.0, 0.0);
-    glTexCoord2f(1.0,1.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glTexCoord2f(1.0,0.0); glVertex3i(((col*WIDTH/maze.getColumns())-(WIDTH/2)), 0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glTexCoord2f(0.0,0.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)),0, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
-    glTexCoord2f(0.0,1.0); glVertex3i((((col+1)*WIDTH/maze.getColumns())-(WIDTH/2)), z, ((row+1)*HEIGHT/maze.getRows())-(HEIGHT/2));
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(1.0,1.0); glVertex3i(p1[0], p1[1], p1[2]);
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(1.0,0.0); glVertex3i(p2[0], p2[1], p2[2]);
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(0.0,0.0); glVertex3i(p3[0], p3[1], p3[2]);
+    glNormal3f(normal[0], normal[1], normal[2]);
+    glTexCoord2f(0.0,1.0); glVertex3i(p4[0], p4[1], p4[2]);
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
+}
 
+float * getNormalFromSquare(int *p1, int *p2, int *p3) {
+    float a[3], b[3], normal[3];
+    a[0] = p3[0] - p2[0];
+    a[1] = p3[1] - p2[1];
+    a[2] = p3[2] - p2[2];
+
+    b[0] = p1[0] - p2[0];
+    b[1] = p1[1] - p2[1];
+    b[2] = p1[2] - p2[2];
+
+    // a x b;
+    normal[0] = (a[1] * b[2] - a[2] * b[1]);
+    normal[1] = (a[2] * b[0] - a[0] * b[2]);
+    normal[2] = (a[0] * b[1] - a[1] * b[0]);
+
+    float modulus = (float)sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+
+    if (modulus == 0.0f) {
+        modulus = 1.0f;
+    }
+
+    normal[0] /= modulus;
+    normal[1] /= modulus;
+    normal[2] /= modulus;
+
+    float * w = (float *)malloc(sizeof(float) * 3);
+    w[0] = normal[0];
+    w[1] = normal[1];
+    w[2] = normal[2];
+
+    return w;
 }
 
 void specialKeys(int key, int x, int y) {
