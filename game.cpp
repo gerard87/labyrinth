@@ -23,6 +23,7 @@ void specialKeys(int key, int x, int y);
 void idle();
 void timer(int extra);
 void timer2(int extra);
+void timer3(int extra);
 void PositionObserver(float alpha,float beta,int radi);
 void keyboard(unsigned char c,int x,int y);
 void printCube(int row, int col);
@@ -289,42 +290,49 @@ void display() {
 
         Particle *agent = maze.getAgent(i);        
 
-        agent->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
-
         if (i == 0) {
             light = GL_LIGHT1;
         } else if (i == 1) {
             light = GL_LIGHT2;
         }
 
-        if(agent->getOrientation() == Directions::LEFT) {
-            dir = left;
-        } else if(agent->getOrientation() == Directions::RIGHT) {
-            dir = right;
-        } else if(agent->getOrientation() == Directions::UP) {
-            dir = up;
-        } else if(agent->getOrientation() == Directions::DOWN) {
-            dir = down;
+        if(!agent->getReset()) {
+            agent->draw((WIDTH/maze.getColumns())/2, (HEIGHT/maze.getRows())/2, WIDTH, HEIGHT);
+
+            
+
+            if(agent->getOrientation() == Directions::LEFT) {
+                dir = left;
+            } else if(agent->getOrientation() == Directions::RIGHT) {
+                dir = right;
+            } else if(agent->getOrientation() == Directions::UP) {
+                dir = up;
+            } else if(agent->getOrientation() == Directions::DOWN) {
+                dir = down;
+            }
+
+            //-- Direccional
+            position[0]=agent->getX()-WIDTH/2; position[1]=0; position[2]=agent->getY()-HEIGHT/2; position[3]=1; 
+            glLightiv(light,GL_POSITION,position);
+            
+            glLightfv (light,GL_SPOT_DIRECTION, dir);
+
+            color[0]=0.8; color[1]=0.8; color[2]=0.8; color[3]=1;
+            glLightfv(light,GL_DIFFUSE,color);
+            
+            glLightf(light,GL_CONSTANT_ATTENUATION,0.35);
+            glLightf(light,GL_LINEAR_ATTENUATION,0.0);
+            glLightf(light,GL_QUADRATIC_ATTENUATION,0.00000002);
+
+            glLightf(light,GL_SPOT_CUTOFF,60.0);
+            glLightf(light,GL_SPOT_EXPONENT, 4.0);
+            
+            glEnable(light);
+            //--End
+        } else {
+            glDisable(light);
         }
-
-        //-- Direccional
-        position[0]=agent->getX()-WIDTH/2; position[1]=0; position[2]=agent->getY()-HEIGHT/2; position[3]=1; 
-        glLightiv(light,GL_POSITION,position);
         
-        glLightfv (light,GL_SPOT_DIRECTION, dir);
-
-        color[0]=0.8; color[1]=0.8; color[2]=0.8; color[3]=1;
-        glLightfv(light,GL_DIFFUSE,color);
-        
-        glLightf(light,GL_CONSTANT_ATTENUATION,0.35);
-        glLightf(light,GL_LINEAR_ATTENUATION,0.0);
-        glLightf(light,GL_QUADRATIC_ATTENUATION,0.00000002);
-
-        glLightf(light,GL_SPOT_CUTOFF,60.0);
-        glLightf(light,GL_SPOT_EXPONENT, 4.0);
-        
-        glEnable(light);
-        //--End
     }
 
     drawStrokeText("Time left to play: " + std::to_string((int)(timeleft)) +"s", 25, HEIGHT - 50, 0);
@@ -356,7 +364,7 @@ void printFloor(int row, int col) {
     p4[0] = (col+1)*w/maze.getColumns()-(w/2); p4[1] = 0; p4[2] = (row*HEIGHT/maze.getRows())-(HEIGHT/2);
 
     normal = Utils::getNormalFromSquare(p1, p2, p3);
-    // normal[0] = 1; normal[1] = 0; normal[2] = 1;
+    normal[0] = 0.1; normal[1] = 0.1; normal[2] = 0.1;
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,0);
@@ -407,6 +415,7 @@ void printCube(int row, int col) {
     p4[0] = ((col+1)*WIDTH/maze.getColumns())-(WIDTH/2); p4[1] = z; p4[2] = (row*HEIGHT/maze.getRows())-(HEIGHT/2);
 
     normal = Utils::getNormalFromSquare(p1, p2, p3);
+    normal[0] = 0.1; normal[1] = 0.1; normal[2] = 0.1;
 
     glBegin(GL_QUADS);
     glNormal3f(normal[0], normal[1], normal[2]);
@@ -585,7 +594,10 @@ void keyboard(unsigned char c,int x,int y) {
             newPos.setCol(newPos.getCol()+orientation.x);
             x+=orientation.x; y+=orientation.y;
         }
-        agent->shoot(maze.getColumns(), maze.getRows(), WIDTH, HEIGHT, x, y);
+
+        glutTimerFunc(1000, timer3, 0);
+        agent->shoot(maze.getColumns(), maze.getRows(), WIDTH, HEIGHT, x, y, 
+                maze.agentInPosition(0, newPos), maze.getAgent(1), maze.getEnemyBase());
     }
         
 
@@ -612,7 +624,7 @@ void idle() {
 }
 
 void timer (int extra) {
-    moveEnemy();
+    if(!maze.getAgent(1)->getReset()) moveEnemy();
     glutTimerFunc(100, timer, 0);
 }
 
@@ -620,6 +632,13 @@ void timer2(int extra) {
     timeleft -= 1.0;
     glutPostRedisplay();
     glutTimerFunc(1000, timer2, 0);
+}
+
+void timer3 (int extra) {
+    for(int i = 0; i < maze.getAgentsNum(); i++) {
+        Particle* agent = maze.getAgent(i);
+        agent->setReset(false);
+    }
 }
 
 void moveEnemy() {

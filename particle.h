@@ -29,6 +29,8 @@ class Particle {
         int rot_state;
         long rot_time_remaining;
 
+        bool reset;
+
         GLUquadric* myReusableQuadric = 0;
         Bullet bullet;
 
@@ -59,7 +61,10 @@ class Particle {
         int getRotState();
         void init_rotate(float angle, Directions::Direction direction, int duration);
         Bullet* getBullet();
-        void shoot(int cols, int rows, int width, int height, int direction_x, int direction_y);
+        void shoot(int cols, int rows, int width, int height, int direction_x, int direction_y, bool kill, Particle* player, Point base);
+        bool getReset();
+        void setReset(bool b);
+        void resetPlayer(Point p, int cols, int rows, int width, int height);
 
 };
 #endif

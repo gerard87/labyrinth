@@ -34,6 +34,10 @@ class Maze {
         Particle* getAgent(int agentIndex);
         int getAgentsNum();
         Point getPlayerBase();
+        Point getEnemyBase();
+
+        // Game Helpers
+        bool agentInPosition(int agentIndex, Point pos);
         bool checkValidMove(int agentIndex, Point to);
 
         std::vector<Directions::Direction> getAvailableMoves(int agentIndex);
@@ -69,6 +73,4 @@ class Maze {
         void setHolesQuantity();
         void removePoint(std::vector<Point> & points, int row, int col);
 
-        // Game Helpers
-        bool agentInPosition(int agentIndex, Point pos);
 }; 

@@ -1,6 +1,6 @@
 #include "bullet.h"
 #include "point.h"
-
+#include "particle.h"
 
 Bullet::Bullet() {
 }
@@ -8,6 +8,7 @@ Bullet::Bullet() {
 Bullet::Bullet(int row, int col) {
     this->state = QUIET;
     this->angle = 0;
+    this->opponentKilled = false;
 }
 
 void Bullet::set_position(int x, int y) {
@@ -17,6 +18,19 @@ void Bullet::set_position(int x, int y) {
 
 int Bullet::getState() {
     return this->state;
+}
+
+void Bullet::setOpponentKilled(bool b) {
+    this->opponentKilled = b;
+}
+
+void Bullet::setOpponent(Particle* player, Point base, int cols, int rows, int width, int height) {
+    this->opponent = player;
+    this->base = base;
+    this->cols = cols;
+    this->rows = rows;
+    this->width = width;
+    this->height = height;
 }
 
 void Bullet::init_movement(int destination_x, int destination_y, int duration) {
@@ -36,6 +50,11 @@ void Bullet::integrate(long t) {
         this->x += this->vx*this->time_remaining;
         this->y += this->vy*this->time_remaining;
         this->state=QUIET;
+        if(this->opponentKilled) {
+            this->opponent->resetPlayer(this->base, this->cols, this->rows, this->width, this->height);
+            this->opponentKilled = false;
+        }
+        
     }
 }
 

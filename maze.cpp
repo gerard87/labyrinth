@@ -84,6 +84,10 @@ Point Maze::getPlayerBase() {
     return this->playerBase;
 }
 
+Point Maze::getEnemyBase() {
+    return this->enemyBase;
+}
+
 Point Maze::getCurrentPosition(int agentIndex) {
     return getAgent(agentIndex)->getPosition();
 }

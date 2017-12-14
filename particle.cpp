@@ -7,6 +7,7 @@ Particle::Particle() {
     this->rot_state = QUIET;
     this->orientation = Directions::DOWN;
     this->angle = 0;
+    this->reset = false;
 }
 
 Particle::Particle(int row, int col) {
@@ -16,6 +17,7 @@ Particle::Particle(int row, int col) {
     this->orientation = Directions::DOWN;
     this->angle = 0;
     this->bullet = Bullet(row, col);
+    this->reset = false;
 }
 
 float Particle::getX() {
@@ -51,10 +53,28 @@ int Particle::getRotState() {
     return this->rot_state;
 }
 
-void Particle::shoot(int cols, int rows, int width, int height, int direction_x, int direction_y) {
+bool Particle::getReset() {
+    return this->reset;
+}
+
+void Particle::setReset(bool b) {
+    this->reset = b;
+}
+
+void Particle::resetPlayer(Point p, int cols, int rows, int width, int height) {
+    this->reset = true;
+    this->position = p;
+    this->x = Utils::col_to_x(p.getCol(), 0, width, cols);
+    this->y = Utils::row_to_y(p.getRow(), 0, height, rows);
+}
+
+void Particle::shoot(int cols, int rows, int width, int height, int direction_x, int direction_y, bool kill, Particle* player, Point base) {
+    this->bullet.setOpponent(player, base, cols, rows, width, height);
+    this->bullet.setOpponentKilled(kill);
     this->bullet.set_position(this->x, this->y);
     this->bullet.init_movement(Utils::col_to_x(this->position.getCol(), direction_x, width, cols),
                         Utils::row_to_y(this->position.getRow(), direction_y, height, rows), 550);
+
 }
 
 void Particle::init_movement(int destination_x, int destination_y, int duration) {
