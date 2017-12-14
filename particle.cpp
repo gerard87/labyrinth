@@ -1,7 +1,6 @@
 #include "particle.h"
 #include "directions.h"
-
-GLUquadric* myReusableQuadric = 0;
+#include "utils.h"
 
 Particle::Particle() {
     this->state = QUIET;
@@ -16,6 +15,7 @@ Particle::Particle(int row, int col) {
     this->rot_state = QUIET;
     this->orientation = Directions::DOWN;
     this->angle = 0;
+    this->bullet = Bullet(row, col);
 }
 
 float Particle::getX() {
@@ -49,6 +49,12 @@ float Particle::getAngle() {
 
 int Particle::getRotState() {
     return this->rot_state;
+}
+
+void Particle::shoot(int cols, int rows, int width, int height, int direction_x, int direction_y) {
+    this->bullet.set_position(this->x, this->y);
+    this->bullet.init_movement(Utils::col_to_x(this->position.getCol(), direction_x, width, cols),
+                        Utils::row_to_y(this->position.getRow(), direction_y, height, rows), 550);
 }
 
 void Particle::init_movement(int destination_x, int destination_y, int duration) {
@@ -93,6 +99,7 @@ void Particle::init_rotate(float angle, Directions::Direction direction, int dur
 void Particle::set_position(int x, int y) {
     this->x = x;
     this->y = y;
+    this->bullet.set_position(x, y);
 }
 
 Point Particle::getPosition() {
@@ -103,30 +110,34 @@ void Particle::setPoint(Point p) {
     this->position = p;
 }
 
-void drawGluSlantCylinder( double height, double radiusBase, double radiusTop, int slices, int stacks )
+Bullet* Particle::getBullet() {
+    return &this->bullet;
+}
+
+void Particle::drawGluSlantCylinder( double height, double radiusBase, double radiusTop, int slices, int stacks )
 {
 	if (!myReusableQuadric) {
 		myReusableQuadric = gluNewQuadric();  
 		gluQuadricNormals(myReusableQuadric, GL_TRUE);
 	}
 
-    glColor3f(0, 0, 0);
+    GLfloat material[] = {0.0, 0.0, 0.0, 1.0};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
     gluCylinder(myReusableQuadric, radiusBase, radiusTop, height, slices, stacks);
     
-    glColor3f(0.3, 0.3, 0.3);
+    material[0] = 0.15; material[1] = 0.15; material[2] = 0.15; material[3] = 1.0;
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
     gluDisk(myReusableQuadric, 0.0, radiusBase, slices, stacks);
     glTranslatef(0, 0, height);
     gluDisk(myReusableQuadric, 0.0, radiusBase, slices, stacks);
 }
 
 
-void drawGluCylinder( double height, double radius, int slices, int stacks ) {
+void Particle::drawGluCylinder( double height, double radius, int slices, int stacks ) {
 	drawGluSlantCylinder( height, radius, radius, slices, stacks );
 }
 
 void Particle::draw(float square_width, float square_height, int width, int height) {
-    float x = getX();
-    float y = getY();
     float radius = square_width/4;
     float diameter = radius;
     int z = (square_height/4)*3;
@@ -139,7 +150,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
 
 
     glPushMatrix();
-    glTranslatef((x-square_height/2)-(width/2) +10, radius, (y-square_width/2)-(height/2)+10);
+    glTranslatef((this->x-square_height/2)-(width/2) +10, radius, (this->y-square_width/2)-(height/2)+10);
 
     glRotatef( this->angle, 0.0, 1.0, 0.0 );
 
@@ -189,7 +200,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
 
 
     /* Cannon base */
-    GLfloat material[] = {0.3, 0.3, 0.3,1.0};
+    GLfloat material[] = {0.3, 0.3, 0.3, 1.0};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
 
     glBegin(GL_QUADS);
@@ -240,8 +251,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     glRotatef( -180.0, 1.0, 0.0, 1.0 );
     
     /* Wheels */
-    material[0] = 0.0; material[1] = 0.0; material[2] = 0.0; material[3] = 1.0;
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
+
     // Parameters: height, radius, slices, stacks
     glTranslatef(-square_width/2, 0, -square_width/2);
     drawGluCylinder(square_height, radius, 90, 1 );
@@ -259,5 +269,7 @@ void Particle::draw(float square_width, float square_height, int width, int heig
     drawGluCylinder(square_height, radius/1.5, 90, 1 );
 
     glPopMatrix();
-    
+
+    if (this->bullet.getState() == MOVE) 
+        this->bullet.draw(square_width, square_height, width, height, this->angle);
 }

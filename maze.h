@@ -34,6 +34,7 @@ class Maze {
         Particle* getAgent(int agentIndex);
         int getAgentsNum();
         Point getPlayerBase();
+        bool checkValidMove(int agentIndex, Point to);
 
         std::vector<Directions::Direction> getAvailableMoves(int agentIndex);
     private:
@@ -70,5 +71,4 @@ class Maze {
 
         // Game Helpers
         bool agentInPosition(int agentIndex, Point pos);
-        bool checkValidMove(int agentIndex, Point to);
 }; 

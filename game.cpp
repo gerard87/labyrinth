@@ -47,6 +47,8 @@ int anglebeta = 35;
 unsigned char *grass, *wall, *top;
 
 void drawStrokeText(std::string text,int x,int y,int z) {
+
+    glDisable(GL_LIGHTING);
     glDisable(GL_TEXTURE_2D);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -59,7 +61,7 @@ void drawStrokeText(std::string text,int x,int y,int z) {
     void * font = GLUT_BITMAP_HELVETICA_18;
     for (string::iterator i = text.begin(); i != text.end(); ++i) {
         char c = *i;
-        glColor3d(1.0, 0.0, 0.0);
+        glColor3d(1.0, 1.0, 1.0);
         glutBitmapCharacter(font, c);
     }
     glMatrixMode(GL_PROJECTION);
@@ -67,6 +69,7 @@ void drawStrokeText(std::string text,int x,int y,int z) {
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     glEnable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
 }
 
 int main(int argc, char* argv[]) {
@@ -252,28 +255,23 @@ void display() {
             
             switch (maze.getValue(row,col)) {
                 case 0:
-                    glColor3f(0.8, 0.8, 0.8);
                     printFloor(row,col);
                     break;        
                 case 1:
-                    glColor3f(0.0, 0.0, 1.0);
                     printCube(row, col);
                     break;
                 case 2: 
                     material[0]=0.0; material[1]=0.8; material[2]=0.0; material[3]=1.0; 
                     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
-                    glColor3f(0.0, 0.8, 0.0);
                     printSquare(row, col);
                     break;
                 case 3: 
                     material[0]=0.8; material[1]=0.0; material[2]=0.0; material[3]=1.0; 
                     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
-                    glColor3f(0.8, 0.0, 0.1);
                     printSquare(row, col);
                     break;            
             } 
       
-                 
         }
 
 
@@ -568,16 +566,29 @@ void moveAgent(int agentIndex, Directions::Direction direction) {
     
 
 void keyboard(unsigned char c,int x,int y) {
-  int i,j;
 
-  if (c=='i' && anglebeta<=(90-4))
-    anglebeta=(anglebeta+3);
-  else if (c=='k' && anglebeta>=(-90+4))
-    anglebeta=anglebeta-3;
-  else if (c=='j')
-    anglealpha=(anglealpha+3)%360;
-  else if (c=='l')
-    anglealpha=(anglealpha-3+360)%360;
+    if (c=='i' && anglebeta<=(90-4))
+        anglebeta=(anglebeta+3);
+    else if (c=='k' && anglebeta>=(-90+4))
+        anglebeta=anglebeta-3;
+    else if (c=='j')
+        anglealpha=(anglealpha+3)%360;
+    else if (c=='l')
+        anglealpha=(anglealpha-3+360)%360;
+    else if (c == 'x') {
+        Particle* agent = maze.getAgent(0);
+        Directions::Direction orientation = agent->getOrientation();
+        Point newPos = Point(agent->getPosition().getRow() + orientation.y, agent->getPosition().getCol() + orientation.x);
+        int x=0, y=0;
+        while(maze.checkValidMove(0, newPos)) {
+            newPos.setRow(newPos.getRow()+orientation.y);
+            newPos.setCol(newPos.getCol()+orientation.x);
+            x+=orientation.x; y+=orientation.y;
+        }
+        agent->shoot(maze.getColumns(), maze.getRows(), WIDTH, HEIGHT, x, y);
+    }
+        
+
 
   glutPostRedisplay();
 }
@@ -588,7 +599,11 @@ void idle() {
     t = glutGet(GLUT_ELAPSED_TIME);
 
     if(last_t != 0) {
-        for(int i = 0; i < maze.getAgentsNum(); i++) maze.getAgent(i)->integrate(t-last_t);
+        for(int i = 0; i < maze.getAgentsNum(); i++) {
+            maze.getAgent(i)->integrate(t-last_t);
+            maze.getAgent(i)->getBullet()->integrate(t-last_t);
+        }
+
     } 
 
     last_t=t;
