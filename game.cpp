@@ -10,6 +10,7 @@
 #include "directions.h"
 #include "utils.h"
 #include "jpeglib.h"
+#include "minimax.h"
 
 #define HEIGHT 1000
 #define PI 3.1416
@@ -642,28 +643,11 @@ void timer3 (int extra) {
 }
 
 void moveEnemy() {
-    Directions::Direction direction;
 
-    for(int i = 1; i < maze.getAgentsNum(); i++) {
-        Particle* agent = maze.getAgent(i);
-        Point pos = agent->getPosition();
+    Minimax minimax = Minimax();
+    Directions::Direction direction = minimax.getAction(maze);
+    moveAgent(1, direction);
 
-        std::vector<Directions::Direction> minMoves;
-        int minDistance = INT_MAX;
-        for(auto const &d : maze.getAvailableMoves(i)){
-            Point newPos = Point(pos.getRow() + d.y, pos.getCol() + d.x);
-            int manDistance = Utils::manhattanDistance(maze.getPlayerBase(), newPos);
-            if (manDistance <= minDistance) {
-                minDistance = manDistance;
-                if (manDistance < minDistance) minMoves.clear();
-                minMoves.push_back(d);
-            }
-        }
-
-        direction = minMoves[rand() % minMoves.size()];
-
-        moveAgent(i, direction);
-    }
 }
 
 

@@ -1,4 +1,5 @@
 #include<cmath>
+#include <stdlib.h>
 #include "utils.h"
 #include "directions.h"
 

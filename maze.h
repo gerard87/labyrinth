@@ -1,3 +1,6 @@
+#ifndef MAZE_H
+#define MAZE_H
+
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -74,3 +77,4 @@ class Maze {
         void removePoint(std::vector<Point> & points, int row, int col);
 
 }; 
+#endif
