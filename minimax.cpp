@@ -1,5 +1,6 @@
 #include "minimax.h"
 #include "utils.h"
+#include "evaluation.h"
 #include <algorithm>
 #include <climits>
 
@@ -11,27 +12,13 @@ Minimax::Minimax(int depth) {
     this->depth = depth;
 }
 
-float Minimax::evaluationFunction(Maze maze, int agent) {
-    float total_score = 0;
-    Point pos = maze.getCurrentPosition(1);
-
-    Point base = agent == 0 ? maze.getEnemyBase() : maze.getPlayerBase();
-
-    int manDistance = Utils::manhattanDistance(base, pos);
-
-    if (manDistance == 0) total_score += 100;
-    else total_score += 1.0/(manDistance + manDistance);
-    
-    return total_score;
-}
-
 Maze Minimax::result(Maze maze, int agent, Directions::Direction direction) {
     if (!this->isWin(maze) || !this->isLose(maze)) maze.move(agent, direction);
     return maze;
 }
 
 float Minimax::utility(Maze maze, int agent) {
-    return this->evaluationFunction(maze, agent);
+    return Evaluation::evaluationFunction(maze, agent);
 }
 
 bool Minimax::terminalTest(Maze maze, int depth) {

@@ -10,8 +10,6 @@ class Minimax {
 
         int depth;
 
-        float evaluationFunction(Maze maze, int agent);
-
         Maze result(Maze maze, int agent, Directions::Direction direction);
         float utility(Maze maze, int agent);
         bool terminalTest(Maze maze, int depth);
