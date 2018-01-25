@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "jpeglib.h"
 #include "minimax.h"
+#include "alphabeta.h"
 
 #define HEIGHT 1000
 #define PI 3.1416
@@ -644,8 +645,9 @@ void timer3 (int extra) {
 
 void moveEnemy() {
 
-    Minimax minimax = Minimax();
-    Directions::Direction direction = minimax.getAction(maze);
+    //Minimax agent = Minimax();
+    Alphabeta agent = Alphabeta();
+    Directions::Direction direction = agent.getAction(maze);
     moveAgent(1, direction);
 
 }
