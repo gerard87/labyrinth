@@ -1,6 +1,6 @@
 #include "minimax.h"
 #include "utils.h"
-#include "evaluation.h"
+#include "agentutils.h"
 #include <algorithm>
 #include <climits>
 
@@ -12,28 +12,14 @@ Minimax::Minimax(int depth) {
     this->depth = depth;
 }
 
-Maze Minimax::result(Maze maze, int agent, Directions::Direction direction) {
-    if (!this->isWin(maze) || !this->isLose(maze)) maze.move(agent, direction);
-    return maze;
-}
-
-float Minimax::utility(Maze maze, int agent) {
-    return Evaluation::evaluationFunction(maze, agent);
-}
-
-bool Minimax::terminalTest(Maze maze, int depth) {
-    return depth == 0 || this->isWin(maze) || this->isLose(maze);
-}
-
-
 float Minimax::maxValue(Maze maze, int agent, int depth) {
 
-    if(this->terminalTest(maze, depth)) return this->utility(maze, agent);
+    if(Agentutils::terminalTest(maze, depth)) return Agentutils::utility(maze, agent);
 
     float v = -INT_MAX;
 
     for(auto const &d : maze.getAvailableMoves(agent)){
-        v = std::max(v, this->minValue(this->result(maze, agent, d), 0, depth));
+        v = std::max(v, this->minValue(Agentutils::result(maze, agent, d), 0, depth));
     }
 
     return v;
@@ -42,7 +28,7 @@ float Minimax::maxValue(Maze maze, int agent, int depth) {
 
 float Minimax::minValue(Maze maze, int agent, int depth) {
 
-    if(this->terminalTest(maze, depth)) return this->utility(maze, agent);
+    if(Agentutils::terminalTest(maze, depth)) return Agentutils::utility(maze, agent);
 
     float v = INT_MAX;
 
@@ -53,7 +39,7 @@ float Minimax::minValue(Maze maze, int agent, int depth) {
         } else {
             v = std::min(v, this->minValue(this->result(maze, agent, d), agent+1, depth));
         }*/
-        v = std::min(v, this->maxValue(this->result(maze, agent, d), 1, depth-1));
+        v = std::min(v, this->maxValue(Agentutils::result(maze, agent, d), 1, depth-1));
     }
 
     return v;
@@ -65,7 +51,7 @@ Directions::Direction Minimax::getAction(Maze maze) {
     float u;
     std::vector<Directions::Direction> actions;
     for(auto const &d : maze.getAvailableMoves(1)){
-        u = this->minValue(this->result(maze, 1, d), 0, this->depth);
+        u = this->minValue(Agentutils::result(maze, 1, d), 0, this->depth);
         if(u == v) {
             actions.push_back(d);
         } else if(u >= v) {
@@ -79,15 +65,3 @@ Directions::Direction Minimax::getAction(Maze maze) {
     return actions[rand() % actions.size()];
 
 }
-
-
-bool Minimax::isWin(Maze maze) {
-    return maze.getPlayerBase().getCol() == maze.getCurrentPosition(1).getCol() &&  
-        maze.getPlayerBase().getRow() == maze.getCurrentPosition(1).getRow();
-}
-
-bool Minimax::isLose(Maze maze) {
-    return maze.getEnemyBase().getCol() == maze.getCurrentPosition(0).getCol() &&  
-        maze.getEnemyBase().getRow() == maze.getCurrentPosition(0).getRow();
-}
-

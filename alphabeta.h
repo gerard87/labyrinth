@@ -10,15 +10,8 @@ class Alphabeta {
 
         int depth;
 
-        Maze result(Maze maze, int agent, Directions::Direction direction);
-        float utility(Maze maze, int agent);
-        bool terminalTest(Maze maze, int depth);
-
         float maxValue(Maze maze, int agent, int depth, float alpha, float beta);
         float minValue(Maze maze, int agent, int depth, float alpha, float beta);
-
-        bool isWin(Maze maze);
-        bool isLose(Maze maze);
 
     public:
 
